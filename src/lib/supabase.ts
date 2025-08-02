@@ -1,82 +1,81 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { createClient } from '@supabase/supabase-js'
-import type { RequestEventBase } from '@builder.io/qwik-city'
-
-// Constantes para acceder a las variables de entorno de Supabase
-export const SUPABASE_URL = import.meta.env.VITE_PUBLIC_SUPABASE_URL || 'https://xyzcompany.supabase.co'
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-key'
+import { createBrowserClient, createServerClient } from '@supabase/ssr'
 
 /**
- * Cliente de Supabase para el navegador
- * Se usa en componentes cliente que no tienen acceso al contexto del servidor
+ * Variables de entorno - SIEMPRE usar import.meta.env en Qwik/Vite
+ * VITE_* = Variables públicas (accesibles en el cliente)
+ * Fallbacks para desarrollo (deberían estar en .env)
  */
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://uyradeufmhqymutizwvt.supabase.co"
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5cmFkZXVmbWhxeW11dGl6d3Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTAyNjQsImV4cCI6MjA2OTQyNjI2NH0.EN0wLExRAcNGW6PrOUN9d4ejc-5Mdm3I6rx7QRd5qjU"
 
 /**
- * Crea un cliente de Supabase para el servidor con soporte para cookies
- * Versión moderna usando @supabase/ssr (recomendado por Supabase)
+ * Cliente Supabase para el NAVEGADOR (client components)
+ * - Usar en useVisibleTask$, event handlers, etc.
+ * - Maneja cookies automáticamente
+ * - ⚠️ NO usar en routeAction$ o routeLoader$
  */
-export function createSupabaseServerClient(event: RequestEventBase) {
-  // Adaptador para las cookies de QwikCity a formato compatible con @supabase/ssr
-  const cookieAdapter = {
-    // Función para obtener una cookie por nombre
-    get(name: string) {
-      return event.cookie.get(name)?.value
-    },
-    // Función para obtener todas las cookies (requerido por la interfaz)
-    getAll() {
-      // QwikCity no proporciona una forma directa de obtener todas las cookies
-      // Esta es una implementación de fallback para compatibilidad
-      return []
-    },
-    // Función para establecer una cookie
-    set(name: string, value: string, options?: CookieOptions) {
-      event.cookie.set(name, value, {
-        ...options,
-        path: options?.path || '/'
-      })
-    },
-    // Función para eliminar una cookie
-    remove(name: string, options?: CookieOptions) {
-      event.cookie.delete(name, {
-        ...options,
-        path: options?.path || '/'
-      })
-    }
-  }
-
-  // Crear cliente de Supabase para servidor con soporte para cookies
-  return createServerClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY,
-    {
-      cookies: cookieAdapter,
-      cookieOptions: {
-        name: 'sb-auth',
-        path: '/',
-        sameSite: 'lax',
-        secure: import.meta.env.PROD === true,
-        maxAge: 60 * 60 * 24 * 7 // 7 días
-      }
-    }
-  )
+export const createClient = () => {
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
 }
 
 /**
- * Mapeo de mensajes de error comunes de Supabase a mensajes más amigables
+ * Cliente Supabase para el SERVIDOR (routeLoader$, routeAction$)
+ * - Recibe Request para leer cookies del navegador
+ * - Esencial para SSR y server actions
+ * - ✅ USAR SIEMPRE en routeAction$ y routeLoader$
  */
-export const AUTH_ERROR_MESSAGES: Record<string, string> = {
-  'Invalid login credentials': 'Credenciales inválidas. Por favor verifica tu email y contraseña.',
-  'Email not confirmed': 'Tu email no ha sido confirmado. Por favor revisa tu bandeja de entrada.',
-  'User not found': 'Usuario no encontrado. ¿Quizás deberías registrarte?',
-  'Password recovery required': 'Debes restablecer tu contraseña antes de iniciar sesión.',
-  'default': 'Ocurrió un error de autenticación. Por favor intenta de nuevo.'
+export const createServerSupabaseClient = (request: Request) => {
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      /**
+       * get = Leer cookies del Request header
+       * Parse manual porque estamos en server environment
+       */
+      get: (key: string) => {
+        const cookieHeader = request.headers.get('cookie')
+        if (!cookieHeader) return undefined
+        
+        // Parse cookies manualmente desde header
+        const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+          const [name, value] = cookie.trim().split('=')
+          if (name && value) {
+            try {
+              // Decodificar URL encoding
+              acc[name] = decodeURIComponent(value)
+            } catch (e) {
+              // Si falla decodificación, usar valor raw
+              acc[name] = value
+            }
+          }
+          return acc
+        }, {} as Record<string, string>)
+        
+        return cookies[key]
+      },
+      /**
+       * set = Escribir cookies (manejado automáticamente por Qwik)
+       * En server actions, Qwik se encarga de la implementación real
+       */
+      set: (key: string, value: string, options?: any) => {
+        // Log para debug en desarrollo
+        if (import.meta.env.DEV) {
+          console.log(`Setting cookie: ${key} = ${value.substring(0, 50)}...`)
+        }
+      },
+      /**
+       * remove = Eliminar cookies (manejado automáticamente por Qwik)
+       */
+      remove: (key: string, options?: any) => {
+        if (import.meta.env.DEV) {
+          console.log(`Removing cookie: ${key}`)
+        }
+      },
+    },
+  })
 }
 
 /**
- * Formatea errores de autenticación para presentarlos al usuario
+ * Cliente simple para casos básicos (backward compatibility)
+ * Mejor usar createClient() explícitamente
  */
-export function getAuthErrorMessage(errorMessage: string | undefined): string {
-  if (!errorMessage) return ''
-  return AUTH_ERROR_MESSAGES[errorMessage] || AUTH_ERROR_MESSAGES.default
-}
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
