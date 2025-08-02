@@ -1,71 +1,62 @@
-import { component$, Slot, useVisibleTask$ } from "@builder.io/qwik"
-import { useLocation, useNavigate } from "@builder.io/qwik-city"
+import { component$, Slot } from "@builder.io/qwik"
+import { routeLoader$ } from "@builder.io/qwik-city"
 import Sidebar from "../components/Sidebar"
-import Header from "../components/Header"
-import { createClient } from "../lib/supabase"
+import { Header } from "../components/HeaderNew"
+import { createServerSupabaseClient } from "../lib/supabase"
+
+/**
+ * Helper function = Determinar si es una ruta de autenticación
+ * Incluye todas las rutas públicas que no requieren login
+ */
+const isAuthenticationRoute = (pathname: string) => {
+  return pathname.startsWith('/login') || 
+         pathname.startsWith('/register') ||
+         pathname.startsWith('/forgot-password') ||
+         pathname.startsWith('/reset-password')
+}
+
+/**
+ * routeLoader$ = Verificación de autenticación en el SERVIDOR
+ * - Se ejecuta ANTES del render, eliminando el flash
+ * - Redirige en el servidor si es necesario
+ * - Retorna estado de sesión para el componente
+ */
+export const useAuthLoader = routeLoader$(async (requestEvent) => {
+  const supabase = createServerSupabaseClient(requestEvent)
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  const pathname = requestEvent.url.pathname
+  const isAuthRoute = isAuthenticationRoute(pathname)
+  
+  // LÓGICA DE PROTECCIÓN DE RUTAS EN EL SERVIDOR
+  
+  // Si no hay sesión y no está en ruta de auth → redirigir al login
+  if (!session && !isAuthRoute) {
+    throw requestEvent.redirect(302, '/login')
+  }
+  
+  // Si hay sesión y está en login/register → redirigir al dashboard
+  if (session && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
+    throw requestEvent.redirect(302, '/')
+  }
+  
+  return {
+    session,
+    isAuthRoute
+  }
+})
 
 /**
  * Layout Global = Wrapper que envuelve TODAS las rutas
- * - Se ejecuta en cada navegación
- * - Maneja autenticación global
+ * - Verificación de auth se hace en el servidor (sin flash)
  * - Renderiza UI diferente según el tipo de ruta
  */
 export default component$(() => {
-  // useLocation = Acceso reactivo a la URL actual (sin causar re-render innecesario)
-  const location = useLocation()
-  // useNavigate = Función para navegar programáticamente
-  const nav = useNavigate()
+  // Server-side auth verification (no flash!)
+  const authState = useAuthLoader()
   
-  /**
-   * ⚠️ useVisibleTask$ aquí es JUSTIFICADO porque:
-   * 1. Verificación de sesión requiere acceso al browser
-   * 2. No hay forma de hacer esto en servidor sin cookies complejas
-   * 3. Se ejecuta una sola vez por carga de página
-   */
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
-    // Cliente browser (solo funciona en el cliente)
-    const supabase = createClient()
-    
-    // Verificar sesión actual
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    // Determinar si estamos en ruta de autenticación
-    const isAuthRoute = location.url.pathname.startsWith('/login') || 
-                       location.url.pathname.startsWith('/register')
-    
-    // LÓGICA DE PROTECCIÓN DE RUTAS
-    // Si no hay sesión y no está en auth → redirigir al login
-    if (!session && !isAuthRoute) {
-      nav('/login')
-      return
-    }
-    
-    // Si hay sesión y está en auth → redirigir al dashboard
-    if (session && isAuthRoute) {
-      nav('/')
-      return
-    }
-    
-    /**
-     * onAuthStateChange = Listener de cambios de autenticación
-     * Se ejecuta cuando:
-     * - Usuario hace login/logout
-     * - Token expira
-     * - Sesión cambia en otra pestaña
-     */
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        nav('/login')
-      } else if (event === 'SIGNED_IN' && isAuthRoute) {
-        nav('/')
-      }
-    })
-  })
-  
-  // Verificar si es una ruta de auth (se calcula en cada render)
-  const isAuthRoute = location.url.pathname.startsWith('/login') || 
-                     location.url.pathname.startsWith('/register')
+  // Usar el estado ya calculado en el servidor (más eficiente)
+  const isAuthRoute = authState.value.isAuthRoute
   
   /**
    * CONDITIONAL RENDERING basado en tipo de ruta

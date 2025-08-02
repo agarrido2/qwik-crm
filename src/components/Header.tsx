@@ -1,4 +1,4 @@
-import { component$, useSignal, useVisibleTask$, $ } from "@builder.io/qwik"
+import { component$, useSignal, useTask$, $ } from "@builder.io/qwik"
 import { useNavigate } from "@builder.io/qwik-city"
 import { createClient } from "../lib/supabase"
 import type { User } from "@supabase/supabase-js"
@@ -19,13 +19,12 @@ export const Header = component$(() => {
   const isLoggingOut = useSignal(false)
 
   /**
-   * useVisibleTask$ = JUSTIFICADO aquí porque:
-   * - Necesita acceso al cliente Supabase del browser
-   * - Configura listeners de autenticación
-   * - Se ejecuta una vez al montar el componente
+   * useTask$ = Configuración de autenticación (MEJOR PRÁCTICA)
+   * - Se ejecuta de forma asíncrona (no bloquea UI)
+   * - Mejor performance que useVisibleTask$
+   * - Para lógica que no requiere acceso directo al DOM
    */
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
+  useTask$(async () => {
     // Cliente browser para operaciones del lado del cliente
     const supabase = createClient()
     
@@ -40,9 +39,12 @@ export const Header = component$(() => {
      * Se ejecuta automáticamente cuando cambia la autenticación
      * Mantiene la UI sincronizada con el estado de auth
      */
-    supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       user.value = session?.user || null
     })
+
+    // Cleanup - cancelar subscription al desmontar componente
+    return () => subscription.unsubscribe()
   })
   
   /**

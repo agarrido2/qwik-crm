@@ -1,6 +1,7 @@
 import { component$ } from '@builder.io/qwik'
 import { Form, routeAction$, Link, z, zod$, type DocumentHead } from '@builder.io/qwik-city'
-import { createServerSupabaseClient } from '../../../lib/supabase'
+import { createServerSupabaseClient } from '~/lib/supabase'
+
 
 // Server Action para registro usando routeAction$ con validación zod$
 export const useRegisterAction = routeAction$(async (values, requestEvent) => {
@@ -14,7 +15,7 @@ export const useRegisterAction = routeAction$(async (values, requestEvent) => {
     })
   }
 
-  const supabase = createServerSupabaseClient(requestEvent.request)
+  const supabase = createServerSupabaseClient(requestEvent)
   
   try {
     const { error } = await supabase.auth.signUp({
@@ -57,12 +58,7 @@ export default component$(() => {
           <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Crear cuenta
           </h2>
-          <p class="mt-2 text-center text-sm text-gray-600">
-            ¿Ya tienes cuenta?{' '}
-            <Link href="/login" class="font-medium text-blue-600 hover:text-blue-500">
-              Inicia sesión
-            </Link>
-          </p>
+         
         </div>
         
         <Form action={registerAction} class="mt-8 space-y-6">
@@ -89,7 +85,7 @@ export default component$(() => {
             </div>
             <div>
               <label for="password" class="sr-only">
-                Contraseña
+                Password
               </label>
               <input
                 id="password"
@@ -98,7 +94,7 @@ export default component$(() => {
                 autoComplete="new-password"
                 required
                 class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
+                placeholder="Password"
                 value={registerAction.formData?.get('password') as string}
               />
               {registerAction.value?.fieldErrors && 'password' in registerAction.value.fieldErrors && (
@@ -109,7 +105,7 @@ export default component$(() => {
             </div>
             <div>
               <label for="confirmPassword" class="sr-only">
-                Confirmar contraseña
+                Confirmar Password
               </label>
               <input
                 id="confirmPassword"
@@ -118,7 +114,7 @@ export default component$(() => {
                 autoComplete="new-password"
                 required
                 class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Confirmar contraseña"
+                placeholder="Confirmar Password"
                 value={registerAction.formData?.get('confirmPassword') as string}
               />
               {registerAction.value?.fieldErrors && 'confirmPassword' in registerAction.value.fieldErrors && (
@@ -180,6 +176,21 @@ export default component$(() => {
               )}
             </button>
           </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <Link
+              href="/login"
+              class="font-medium text-blue-600 hover:text-blue-500"
+            >
+              ¿Ya tienes cuenta? Inicia sesión
+            </Link>
+            <Link
+              href="/forgot-password"
+              class="font-medium text-blue-600 hover:text-blue-500"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
         </Form>
       </div>
     </div>
@@ -195,3 +206,4 @@ export const head: DocumentHead = {
     },
   ],
 };
+

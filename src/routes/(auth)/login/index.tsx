@@ -1,6 +1,7 @@
-import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik'
-import { Link, type DocumentHead, routeAction$, Form, z, zod$ } from '@builder.io/qwik-city'
-import { createServerSupabaseClient } from '../../../lib/supabase'
+import { component$, useSignal, useTask$ } from '@builder.io/qwik'
+import { type DocumentHead, routeAction$, Form, z, zod$, Link } from '@builder.io/qwik-city'
+import { createServerSupabaseClient } from '~/lib/supabase'
+
 
 /**
  * Server Action - SE EJECUTA SOLO EN EL SERVIDOR
@@ -8,8 +9,8 @@ import { createServerSupabaseClient } from '../../../lib/supabase'
  * zod$ = Validación de esquemas que ocurre antes de ejecutar la función
  */
 export const useLoginAction = routeAction$(async (values, requestEvent) => {
-  // IMPORTANTE: Usar cliente de servidor, NO el cliente del browser
-  const supabase = createServerSupabaseClient(requestEvent.request)
+  // IMPORTANTE: Pasar requestEvent completo para manejo correcto de cookies
+  const supabase = createServerSupabaseClient(requestEvent)
   
   try {
     // Llamada a Supabase para autenticar - esto ocurre en el servidor
@@ -62,12 +63,12 @@ export default component$(() => {
   const formKey = useSignal(Date.now())
   
   /**
-   * useVisibleTask$ = useEffect que se ejecuta SOLO EN EL CLIENTE
-   * ⚠️ Usar solo cuando sea absolutamente necesario
+   * useTask$ = Hook reactivo que se ejecuta en servidor Y cliente
+   * ✅ Más eficiente que useVisibleTask$ para este caso
+   * ✅ No necesita esperar hidratación del cliente
    * track() = Escucha cambios en valores específicos (reactividad)
    */
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(({ track }) => {
+  useTask$(({ track }) => {
     // track() convierte loginAction.value en una dependencia reactiva
     track(() => loginAction.value)
     
@@ -81,16 +82,11 @@ export default component$(() => {
   return (
     <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-md w-full space-y-8">
-        <div>
+        <div class="text-center">
           <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Iniciar sesión
           </h2>
-          <p class="mt-2 text-center text-sm text-gray-600">
-            ¿No tienes cuenta?{' '}
-            <Link href="/register" class="font-medium text-blue-600 hover:text-blue-500">
-              Regístrate
-            </Link>
-          </p>
+        <h3 class="font-semibold text-lg">Sistema de Loguin</h3>
         </div>
         
         {/* 
@@ -101,7 +97,7 @@ export default component$(() => {
           - key={formKey.value} fuerza recrear componente cuando cambia
         */}
         <Form action={loginAction} class="mt-8 space-y-6" key={formKey.value}>
-          <div class="rounded-md shadow-sm -space-y-px">
+          <div class="rounded-md shadow-sm -space-y-px ">
             <div>
               <label for="email" class="sr-only">
                 Email
@@ -120,7 +116,7 @@ export default component$(() => {
                 class={`appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
                   loginAction.value?.fieldErrors && 'email' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.email?.length ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Dirección de email"
+                placeholder="email@email.com"
               />
               {/* Mostrar errores de campo específicos (validación zod$) */}
               {loginAction.value?.fieldErrors && 'email' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.email && (
@@ -131,7 +127,7 @@ export default component$(() => {
             </div>
             <div>
               <label for="password" class="sr-only">
-                Contraseña
+                Password
               </label>
               {/* Password input sin value = Seguridad y UX mejorados */}
               <input
@@ -143,7 +139,7 @@ export default component$(() => {
                 class={`appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
                   loginAction.value?.fieldErrors && 'password' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.password?.length ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Contraseña"
+                placeholder="your-password here"
               />
               {loginAction.value?.fieldErrors && 'password' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.password && (
                 <p class="mt-1 text-sm text-red-600">
@@ -200,6 +196,21 @@ export default component$(() => {
                 'Iniciar sesión'
               )}
             </button>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <Link
+              href="/register"
+              class="font-medium text-blue-600 hover:text-blue-500"
+            >
+              ¿No tienes cuenta? Regístrate
+            </Link>
+            <Link
+              href="/forgot-password"
+              class="font-medium text-blue-600 hover:text-blue-500"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
         </Form>
       </div>

@@ -1,12 +1,23 @@
 import { createBrowserClient, createServerClient } from '@supabase/ssr'
+import type { RequestEventCommon } from '@builder.io/qwik-city'
 
 /**
  * Variables de entorno - SIEMPRE usar import.meta.env en Qwik/Vite
  * VITE_* = Variables públicas (accesibles en el cliente)
- * Fallbacks para desarrollo (deberían estar en .env)
+ * ⚠️ NUNCA hardcodear credenciales - usar archivos .env
  */
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://uyradeufmhqymutizwvt.supabase.co"
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5cmFkZXVmbWhxeW11dGl6d3Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTAyNjQsImV4cCI6MjA2OTQyNjI2NH0.EN0wLExRAcNGW6PrOUN9d4ejc-5Mdm3I6rx7QRd5qjU"
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+// Validación de variables requeridas
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Faltan variables de entorno requeridas:\n' +
+    '- VITE_SUPABASE_URL\n' +
+    '- VITE_SUPABASE_ANON_KEY\n' +
+    'Crea un archivo .env con estas variables.'
+  )
+}
 
 /**
  * Cliente Supabase para el NAVEGADOR (client components)
@@ -20,55 +31,46 @@ export const createClient = () => {
 
 /**
  * Cliente Supabase para el SERVIDOR (routeLoader$, routeAction$)
- * - Recibe Request para leer cookies del navegador
+ * - Recibe RequestEvent completo para manejar cookies correctamente
  * - Esencial para SSR y server actions
  * - ✅ USAR SIEMPRE en routeAction$ y routeLoader$
+ * 
+ * API moderna de @supabase/ssr v0.6+
  */
-export const createServerSupabaseClient = (request: Request) => {
+export const createServerSupabaseClient = (requestEvent: RequestEventCommon) => {
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       /**
-       * get = Leer cookies del Request header
-       * Parse manual porque estamos en server environment
+       * getAll = Método moderno para obtener todas las cookies
        */
-      get: (key: string) => {
-        const cookieHeader = request.headers.get('cookie')
-        if (!cookieHeader) return undefined
+      getAll() {
+        const cookieHeader = requestEvent.request.headers.get('cookie')
+        if (!cookieHeader) return []
         
-        // Parse cookies manualmente desde header
-        const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+        return cookieHeader.split(';').map(cookie => {
           const [name, value] = cookie.trim().split('=')
-          if (name && value) {
-            try {
-              // Decodificar URL encoding
-              acc[name] = decodeURIComponent(value)
-            } catch (e) {
-              // Si falla decodificación, usar valor raw
-              acc[name] = value
-            }
+          return {
+            name: name || '',
+            value: value ? decodeURIComponent(value) : ''
           }
-          return acc
-        }, {} as Record<string, string>)
-        
-        return cookies[key]
+        }).filter(cookie => cookie.name && cookie.value)
       },
       /**
-       * set = Escribir cookies (manejado automáticamente por Qwik)
-       * En server actions, Qwik se encarga de la implementación real
+       * setAll = Método moderno para establecer múltiples cookies
        */
-      set: (key: string, value: string, options?: any) => {
-        // Log para debug en desarrollo
-        if (import.meta.env.DEV) {
-          console.log(`Setting cookie: ${key} = ${value.substring(0, 50)}...`)
-        }
-      },
-      /**
-       * remove = Eliminar cookies (manejado automáticamente por Qwik)
-       */
-      remove: (key: string, options?: any) => {
-        if (import.meta.env.DEV) {
-          console.log(`Removing cookie: ${key}`)
-        }
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          if (requestEvent.cookie) {
+            requestEvent.cookie.set(name, value, {
+              path: '/',
+              httpOnly: true,
+              secure: true,
+              sameSite: 'lax',
+              maxAge: 60 * 60 * 24 * 365, // 1 año
+              ...options
+            })
+          }
+        })
       },
     },
   })
