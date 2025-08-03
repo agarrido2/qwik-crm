@@ -84,9 +84,9 @@ export default component$(() => {
       <div class="max-w-md w-full space-y-8">
         <div class="text-center">
           <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Iniciar sesión
+            Wellcome back to CRM 👋
           </h2>
-        <h3 class="font-semibold text-lg">Sistema de Loguin</h3>
+        <h3 class="font-semibold text-lg">Please sign in to continue</h3>
         </div>
         
         {/* 
@@ -97,7 +97,7 @@ export default component$(() => {
           - key={formKey.value} fuerza recrear componente cuando cambia
         */}
         <Form action={loginAction} class="mt-8 space-y-6" key={formKey.value}>
-          <div class="rounded-md shadow-sm -space-y-px ">
+          <div class="shadow-sm border border-gray-300 rounded-lg p-5 lg:p-7 flex flex-col gap-4">
             <div>
               <label for="email" class="sr-only">
                 Email
@@ -113,7 +113,7 @@ export default component$(() => {
                 type="email"
                 autoComplete="email"
                 required
-                class={`appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
+                class={`appearance-none rounded-md relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
                   loginAction.value?.fieldErrors && 'email' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.email?.length ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="email@email.com"
@@ -136,7 +136,7 @@ export default component$(() => {
                 type="password"
                 autoComplete="current-password"
                 required
-                class={`appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
+                class={`appearance-none rounded-md relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
                   loginAction.value?.fieldErrors && 'password' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.password?.length ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="your-password here"

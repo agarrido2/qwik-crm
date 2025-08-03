@@ -5,20 +5,22 @@ import { authSchemas } from "~/lib/auth-schemas";
 import { withSupabase } from "~/lib/auth-helpers";
 
 /**
- * routeLoader$ = Verificar si usuario ya está autenticado
- * - Se ejecuta en el servidor ANTES del render
+ * routeLoader$ = Verificar si el usuario ya está autenticado
+ * - Usa getUser() para verificación segura
  * - Evita el flash de contenido al redirigir usuarios autenticados
  */
 export const useAuthCheck = routeLoader$(async (requestEvent) => {
   const supabase = createServerSupabaseClient(requestEvent);
-  const { data: { session } } = await supabase.auth.getSession();
+  
+  // ✅ SEGURO: getUser() verifica autenticidad con servidor Auth
+  const { data: { user } } = await supabase.auth.getUser();
   
   // Si ya está autenticado, redirigir al dashboard
-  if (session) {
+  if (user) {
     throw requestEvent.redirect(302, "/");
   }
   
-  return { hasSession: !!session };
+  return {};
 });
 
 /**

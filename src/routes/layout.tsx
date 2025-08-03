@@ -19,29 +19,31 @@ const isAuthenticationRoute = (pathname: string) => {
  * routeLoader$ = Verificación de autenticación en el SERVIDOR
  * - Se ejecuta ANTES del render, eliminando el flash
  * - Redirige en el servidor si es necesario
- * - Retorna estado de sesión para el componente
+ * - Usa getUser() para verificación segura con el servidor Auth
  */
 export const useAuthLoader = routeLoader$(async (requestEvent) => {
   const supabase = createServerSupabaseClient(requestEvent)
-  const { data: { session } } = await supabase.auth.getSession()
+  
+  // ✅ SEGURO: getUser() verifica con el servidor Auth de Supabase
+  const { data: { user }, error } = await supabase.auth.getUser()
   
   const pathname = requestEvent.url.pathname
   const isAuthRoute = isAuthenticationRoute(pathname)
   
   // LÓGICA DE PROTECCIÓN DE RUTAS EN EL SERVIDOR
   
-  // Si no hay sesión y no está en ruta de auth → redirigir al login
-  if (!session && !isAuthRoute) {
+  // Si no hay usuario autenticado y no está en ruta de auth → redirigir al login
+  if (!user && !isAuthRoute) {
     throw requestEvent.redirect(302, '/login')
   }
   
-  // Si hay sesión y está en login/register → redirigir al dashboard
-  if (session && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
+  // Si hay usuario autenticado y está en login/register → redirigir al dashboard
+  if (user && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
     throw requestEvent.redirect(302, '/')
   }
   
   return {
-    session,
+    user,
     isAuthRoute
   }
 })

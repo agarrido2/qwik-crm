@@ -28,10 +28,10 @@ export const Header = component$(() => {
     // Cliente browser para operaciones del lado del cliente
     const supabase = createClient()
     
-    // Obtener usuario actual de la sesión
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session?.user) {
-      user.value = session.user
+    // ✅ SEGURO: getUser() verifica autenticidad con servidor Auth
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (authUser) {
+      user.value = authUser
     }
     
     /**

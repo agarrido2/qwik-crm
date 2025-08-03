@@ -10,16 +10,18 @@ import { withSupabase } from "~/lib/auth-helpers";
 const resetPasswordSchema = zod$(authSchemas.resetPassword);
 
 /**
- * routeLoader$ = Loader para verificar si hay sesión válida de reset
- * - Verifica que el usuario llegó desde un link de reset válido
- * - Redirige al login si no hay sesión de reset
+ * routeLoader$ = Verificar si hay sesión válida para reset de contraseña
+ * - Usa getUser() para verificación segura
+ * - Redirige al login si no hay usuario válido
  */
 export const useResetSession = routeLoader$(async (requestEvent) => {
   const supabase = createServerSupabaseClient(requestEvent);
-  const { data: { session } } = await supabase.auth.getSession();
+  
+  // ✅ SEGURO: getUser() verifica autenticidad con servidor Auth
+  const { data: { user } } = await supabase.auth.getUser();
   
   return {
-    hasValidSession: !!session,
+    hasValidUser: !!user,
   };
 });
 
@@ -71,8 +73,8 @@ export default component$(() => {
   const isSubmitting = useSignal(false);
   const showPassword = useSignal(false);
 
-  // Si no hay sesión válida, mostrar mensaje de error
-  if (!resetSession.value.hasValidSession) {
+  // Si no hay usuario válido, mostrar mensaje de error
+  if (!resetSession.value.hasValidUser) {
     return (
       <div class="min-h-screen flex items-center justify-center bg-gray-50">
         <div class="max-w-md w-full text-center">
