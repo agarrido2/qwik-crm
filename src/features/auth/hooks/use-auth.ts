@@ -1,6 +1,6 @@
 import { useSignal, useTask$, $ } from "@builder.io/qwik";
 import { useNavigate } from "@builder.io/qwik-city";
-import { createClient } from "./supabase";
+import { createClient } from "../../../lib/database/supabase";
 import type { User } from "@supabase/supabase-js";
 
 /**

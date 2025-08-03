@@ -1,5 +1,5 @@
 import type { RequestEventAction } from "@builder.io/qwik-city";
-import { createServerSupabaseClient } from "./supabase";
+import { createServerSupabaseClient } from "../../../lib/database/supabase";
 
 /**
  * withSupabase = Helper que wrappea server actions con cliente Supabase

@@ -1,8 +1,8 @@
 import { component$, useSignal } from "@builder.io/qwik";
 import { Form, routeAction$, routeLoader$, zod$ } from "@builder.io/qwik-city";
 import { createServerSupabaseClient } from "~/lib/supabase";
-import { authSchemas } from "~/lib/auth-schemas";
-import { withSupabase } from "~/lib/auth-helpers";
+import { authSchemas } from "~/features/auth/schemas/auth-schemas";
+import { withSupabase } from "~/features/auth/services/auth-helpers";
 
 /**
  * routeLoader$ = Verificar si el usuario ya está autenticado

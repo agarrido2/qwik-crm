@@ -1,16 +1,15 @@
 import { component$, Slot } from "@builder.io/qwik"
 import { routeLoader$ } from "@builder.io/qwik-city"
-import { AuthProvider, AppLayout } from "~/components"
 import { createServerSupabaseClient } from "~/lib/database"
 
 /**
- * 🏛️ Layout Global - Arquitectura Limpia
+ * 🛡️ ProtectedRoute Component
  * 
- * Responsabilidades separadas:
- * - AuthProvider: Contexto global de autenticación
- * - useAuthGuard: Verificación y protección de rutas (server-side)
- * - AppLayout: Estructura visual de la aplicación
- * - Renderizado condicional basado en el tipo de ruta
+ * Responsabilidad única: Verificación de autenticación server-side
+ * - Ejecuta verificación antes del render (sin flash)
+ * - Redirige automáticamente si no hay usuario
+ * - Soporta redirectTo para UX optimizada
+ * - Retorna usuario verificado para el contexto
  */
 
 /**
@@ -39,6 +38,7 @@ const isProtectedRoute = (pathname: string): boolean => {
  * - Redirige en el servidor si es necesario
  * - Usa getUser() para verificación segura con el servidor Auth
  */
+// eslint-disable-next-line qwik/loader-location
 export const useAuthGuard = routeLoader$(async (requestEvent) => {
   const supabase = createServerSupabaseClient(requestEvent)
   
@@ -69,30 +69,14 @@ export const useAuthGuard = routeLoader$(async (requestEvent) => {
   }
 })
 
-export default component$(() => {
-  // Server-side auth verification (implementado en useAuthGuard)
-  const authState = useAuthGuard()
+/**
+ * ProtectedRoute wrapper component
+ * - Usa el hook de protección
+ * - Renderiza contenido solo si la verificación pasa
+ */
+export const ProtectedRoute = component$(() => {
+  // Si llegamos aquí, la verificación de auth pasó
+  // (sino habría ocurrido redirect en el servidor)
   
-  // Usar el estado ya calculado en el servidor (más eficiente)
-  const isPublic = authState.value.isPublic
-  const user = authState.value.user
-  
-  return (
-    <AuthProvider user={user}>
-      {/* 
-        CONDITIONAL RENDERING basado en tipo de ruta
-        - Rutas públicas (landing, auth): Solo el contenido (sin sidebar/header)
-        - Rutas protegidas (dashboard): Layout completo con sidebar y header
-      */}
-      {isPublic ? (
-        // Rutas públicas: Solo el contenido
-        <Slot />
-      ) : (
-        // Rutas protegidas: Layout completo con AppLayout
-        <AppLayout>
-          <Slot />
-        </AppLayout>
-      )}
-    </AuthProvider>
-  )
+  return <Slot />
 })

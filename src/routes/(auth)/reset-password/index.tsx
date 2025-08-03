@@ -1,8 +1,8 @@
 import { component$, useSignal } from "@builder.io/qwik";
 import {type DocumentHead, Form, routeAction$, routeLoader$, zod$ } from "@builder.io/qwik-city";
 import { createServerSupabaseClient } from "~/lib/supabase";
-import { authSchemas, validatePasswordMatch } from "~/lib/auth-schemas";
-import { withSupabase } from "~/lib/auth-helpers";
+import { authSchemas, validatePasswordMatch } from "~/features/auth/schemas/auth-schemas";
+import { withSupabase } from "~/features/auth/services/auth-helpers";
 
 /**
  * Schema de validación para reset password usando schemas centralizados

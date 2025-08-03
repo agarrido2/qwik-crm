@@ -31,7 +31,10 @@ export const useLoginAction = routeAction$(async (values, requestEvent) => {
     
     // throw redirect = ÚNICA manera de redirigir desde server action
     // 302 = Redirect temporal (usuario autenticado exitosamente)
-    throw requestEvent.redirect(302, '/')
+    
+    // Verificar si hay una URL de redirección en query params
+    const redirectTo = requestEvent.url.searchParams.get('redirectTo') || '/dashboard';
+    throw requestEvent.redirect(302, redirectTo)
   } catch (error) {
     // Si es una Response (redirect), re-lanzarla
     if (error instanceof Response) {
