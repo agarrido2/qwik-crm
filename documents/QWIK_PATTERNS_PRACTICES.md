@@ -1,5 +1,117 @@
 # Patrones de Código y Mejores Prácticas - Qwik CRM
 
+## 🔥 **CONTEXTO GLOBAL - PATRÓN IMPLEMENTADO (AGOSTO 2025)**
+
+### **✅ Estado: FUNCIONANDO Y PROBADO**
+
+#### **1. Context ID y Tipos Avanzados**
+```typescript
+// ✅ IMPLEMENTADO: src/lib/auth-context.ts
+import { createContextId, type QRL } from "@builder.io/qwik"
+import type { User } from "@supabase/supabase-js"
+
+export interface AuthContextValue {
+  user: User | null                     // Server-verified user
+  isAuthenticated: boolean              // Computed boolean
+  logout: QRL<() => Promise<void>>      // Lazy-loaded function
+}
+
+export const AuthContext = createContextId<AuthContextValue>(
+  'qwik-crm.auth.user-context' // Naming convention
+)
+```
+
+#### **2. Hook de Consumo con Error Handling**
+```typescript
+// ✅ IMPLEMENTADO: src/lib/use-auth-context.ts
+export const useAuthContext = (): AuthContextValue => {
+  try {
+    const authContext = useContext(AuthContext)
+    
+    // Development debugging
+    if (import.meta.env.DEV && !authContext) {
+      console.warn('🚨 AuthContext: No se encontró el contexto...')
+    }
+    
+    return authContext
+  } catch (error) {
+    throw new Error('❌ useAuthContext debe ser usado dentro de un componente...')
+  }
+}
+
+export const useAuth = useAuthContext // Alias conciso
+```
+
+#### **3. Provider en Layout Principal**
+```typescript
+// ✅ IMPLEMENTADO: src/routes/layout.tsx
+export default component$(() => {
+  const authState = useAuthLoader() // Server-side data
+  const nav = useNavigate()
+  
+  // Context value preparation
+  const authContextValue: AuthContextValue = {
+    user: authState.value.user,
+    isAuthenticated: !!authState.value.user,
+    logout: $(async () => {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signOut()
+      if (!error) {
+        nav('/login')
+      }
+    })
+  }
+  
+  // Global context provider
+  useContextProvider(AuthContext, authContextValue)
+  
+  // Conditional rendering...
+})
+```
+
+#### **4. Uso en Componentes**
+```typescript
+// ✅ PATRÓN UNIVERSAL: En cualquier componente
+import { useAuth } from "../lib/use-auth-context"
+
+export default component$(() => {
+  const auth = useAuth() // 🔥 Zero configuration!
+  
+  return (
+    <div>
+      <h1>Hola, {auth.user?.email}</h1>
+      <button onClick$={auth.logout}>Cerrar Sesión</button>
+      <p>Estado: {auth.isAuthenticated ? 'Conectado' : 'Desconectado'}</p>
+    </div>
+  )
+})
+```
+
+### **🎯 Beneficios Técnicos Conseguidos**
+
+#### **✅ Server-First Architecture**
+- Datos vienen de `routeLoader$` (server-verified)
+- Zero flash loading states
+- Secure con `getUser()` en lugar de `getSession()`
+
+#### **✅ Performance Optimizada**
+- QRL functions para lazy loading
+- Bundle splitting automático
+- Zero re-renders innecesarios
+
+#### **✅ Developer Experience**
+- Type safety completo end-to-end
+- Error handling descriptivo
+- Zero prop drilling
+- Debugging info en desarrollo
+
+#### **✅ Escalabilidad**
+- Fácil extensión de funcionalidades
+- Separación clara de responsabilidades
+- Testeable y mantenible
+
+---
+
 ## 🎯 **Patrones de Server Actions**
 
 ### **1. Patrón Estándar con routeAction$**

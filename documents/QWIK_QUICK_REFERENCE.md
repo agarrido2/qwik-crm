@@ -18,6 +18,53 @@ bun run fmt.check        # Check formatting
 bun run build.types      # Verificar tipos TypeScript
 ```
 
+# Quick Reference Guide - Qwik CRM
+
+## 🔥 **CONTEXTO GLOBAL - IMPLEMENTADO (AGOSTO 2025)**
+
+### **✅ Hook Principal**
+```typescript
+import { useAuth } from "../lib/use-auth-context"
+
+const auth = useAuth() // 🔥 Zero configuration!
+// auth.user - Usuario verificado server-side
+// auth.isAuthenticated - Boolean computed
+// auth.logout - QRL lazy function
+```
+
+### **✅ Componente con Contexto**
+```typescript
+export default component$(() => {
+  const auth = useAuth()
+  
+  if (!auth.isAuthenticated) {
+    return <div>No autenticado</div>
+  }
+  
+  return (
+    <div>
+      <h1>{auth.user?.email}</h1>
+      <button onClick$={auth.logout}>Logout</button>
+    </div>
+  )
+})
+```
+
+### **✅ Archivos del Contexto**
+- `src/lib/auth-context.ts` - Context ID y tipos
+- `src/lib/use-auth-context.ts` - Hook de consumo
+- `src/routes/layout.tsx` - Provider principal
+- `src/components/UserProfileDemo.tsx` - Componentes demo
+
+### **✅ Beneficios Conseguidos**
+- 🚀 **Zero prop drilling**: Acceso directo
+- ⚡ **Lazy loading**: QRL functions optimizadas  
+- 🛡️ **Server-verified**: Datos seguros
+- 🎯 **Type safe**: TypeScript completo
+- 🔧 **Error handling**: Mensajes descriptivos
+
+---
+
 ## 🎯 **Patrones de Código Rápidos**
 
 ### **1. Server Action Básico**

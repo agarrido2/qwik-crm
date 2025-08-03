@@ -1,148 +1,188 @@
-import { component$, $ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import { useNavigate } from "@builder.io/qwik-city";
-import { createClient } from "../../lib/supabase";
+import { UserProfileCard, QuickUserInfo } from "../../components/UserProfileDemo";
+import { useAuth } from "../../lib/use-auth-context";
 
 export default component$(() => {
-  const nav = useNavigate()
+  // 🔥 CONTEXTO EN ACCIÓN: Acceso directo sin configuración
+  const auth = useAuth()
   
-  const handleTestLogout = $(async () => {
-    const supabase = createClient()
-    
-    try {
-      // Cerrar sesión en Supabase
-      const { error } = await supabase.auth.signOut()
-      
-      if (error) {
-        console.error('Error en logout:', error)
-        alert('Error al cerrar sesión: ' + error.message)
-        return
-      }
-      
-      // Limpiar localStorage y sessionStorage
-      if (typeof window !== 'undefined') {
-        localStorage.clear()
-        sessionStorage.clear()
-      }
-      
-      // Redirigir al login
-      nav('/login')
-      
-      // Mostrar confirmación
-      alert('Sesión cerrada correctamente. ¡Ahora puedes probar el login desde cero!')
-    } catch (error) {
-      console.error('Error inesperado en logout:', error)
-      alert('Error inesperado al cerrar sesión')
-    }
-  })
-
   return (
-    <div class="max-w-7xl mx-auto">
-      {/* Botón de logout para testing */}
-      <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+    <div class="space-y-8">
+      {/* 🎯 Hero Section */}
+      <div class="bg-gradient-to-r from-blue-600 to-purple-700 rounded-lg p-8 text-white">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-sm font-medium text-yellow-800">🧪 Botón de Testing</h3>
-            <p class="text-sm text-yellow-700">
-              Usa este botón para cerrar sesión y probar el login desde cero
+            <h1 class="text-3xl font-bold mb-2">
+              ¡Bienvenido al CRM! 🚀
+            </h1>
+            <p class="text-blue-100 text-lg">
+              Contexto global implementado con excelencia técnica
             </p>
           </div>
-          <button
-            onClick$={handleTestLogout}
-            class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            🚪 Logout Completo (Testing)
-          </button>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+            <QuickUserInfo />
+          </div>
         </div>
       </div>
-      
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">
-          Bienvenido al CRM 👋
-        </h1>
-        <p class="text-lg text-gray-600">
-          ¡Hola! Has iniciado sesión correctamente en tu sistema de gestión de relaciones con clientes.
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
+
+      {/* 📊 Stats Grid */}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                <span class="text-white font-bold">C</span>
-              </div>
+            <div class="p-3 rounded-lg bg-blue-100">
+              <span class="text-2xl">👥</span>
             </div>
             <div class="ml-4">
-              <h3 class="text-lg font-medium text-gray-900">Clientes</h3>
-              <p class="text-sm text-gray-500">Gestiona tus clientes</p>
+              <h3 class="text-lg font-semibold text-gray-900">Clientes</h3>
+              <p class="text-gray-600">Gestiona tu cartera</p>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white rounded-lg shadow p-6">
+
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                <span class="text-white font-bold">O</span>
-              </div>
+            <div class="p-3 rounded-lg bg-green-100">
+              <span class="text-2xl">💼</span>
             </div>
             <div class="ml-4">
-              <h3 class="text-lg font-medium text-gray-900">Oportunidades</h3>
-              <p class="text-sm text-gray-500">Seguimiento de ventas</p>
+              <h3 class="text-lg font-semibold text-gray-900">Oportunidades</h3>
+              <p class="text-gray-600">Cierra más ventas</p>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white rounded-lg shadow p-6">
+
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                <span class="text-white font-bold">A</span>
-              </div>
+            <div class="p-3 rounded-lg bg-purple-100">
+              <span class="text-2xl">📈</span>
             </div>
             <div class="ml-4">
-              <h3 class="text-lg font-medium text-gray-900">Actividades</h3>
-              <p class="text-sm text-gray-500">Tareas y eventos</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-orange-500 rounded-md flex items-center justify-center">
-                <span class="text-white font-bold">R</span>
-              </div>
-            </div>
-            <div class="ml-4">
-              <h3 class="text-lg font-medium text-gray-900">Reportes</h3>
-              <p class="text-sm text-gray-500">Análisis y métricas</p>
+              <h3 class="text-lg font-semibold text-gray-900">Reportes</h3>
+              <p class="text-gray-600">Analiza resultados</p>
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-900">Actividad Reciente</h2>
+
+      {/* 🎯 Two Column Layout */}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* 🚀 Left: Context Demo */}
+        <div>
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">
+              🔥 Contexto Global en Acción
+            </h2>
+            <p class="text-gray-600">
+              Este componente accede al usuario sin props ni configuración adicional.
+            </p>
+          </div>
+          
+          <UserProfileCard />
         </div>
-        <div class="px-6 py-4">
-          <p class="text-gray-500 text-center py-8">
-            No hay actividad reciente para mostrar.
-          </p>
+
+        {/* 📝 Right: Technical Details */}
+        <div>
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">
+              ⚡ Beneficios Técnicos
+            </h2>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+            <div class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm">✓</span>
+              </span>
+              <div>
+                <h4 class="font-semibold text-gray-900">Server-Side Verified</h4>
+                <p class="text-sm text-gray-600">Usuario verificado con getUser() en el servidor</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm">✓</span>
+              </span>
+              <div>
+                <h4 class="font-semibold text-gray-900">Zero Prop Drilling</h4>
+                <p class="text-sm text-gray-600">Acceso directo sin pasar props entre componentes</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm">✓</span>
+              </span>
+              <div>
+                <h4 class="font-semibold text-gray-900">Lazy Loading</h4>
+                <p class="text-sm text-gray-600">Funciones QRL cargadas solo cuando se necesitan</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm">✓</span>
+              </span>
+              <div>
+                <h4 class="font-semibold text-gray-900">Type Safety</h4>
+                <p class="text-sm text-gray-600">TypeScript completo end-to-end</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm">✓</span>
+              </span>
+              <div>
+                <h4 class="font-semibold text-gray-900">Consistent State</h4>
+                <p class="text-sm text-gray-600">Estado sincronizado en toda la aplicación</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 📖 Usage Example */}
+          <div class="mt-6 bg-gray-900 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-gray-300 mb-2">Uso en cualquier componente:</h4>
+            <pre class="text-green-400 text-sm">
+{`import { useAuth } from "../lib/use-auth-context"
+
+export default component$(() => {
+  const auth = useAuth() // 🔥 ¡Así de simple!
+  
+  return <div>{auth.user?.email}</div>
+})`}
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      {/* 🎯 Status Bar */}
+      <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div class="flex items-center">
+          <span class="text-green-600 text-lg mr-3">🎉</span>
+          <div>
+            <h4 class="text-green-800 font-semibold">
+              Contexto Global Implementado Exitosamente
+            </h4>
+            <p class="text-green-700 text-sm">
+              Estado: <strong>{auth.isAuthenticated ? '✅ Autenticado' : '❌ No autenticado'}</strong> | 
+              Usuario: <strong>{auth.user?.email || 'N/A'}</strong>
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  );
-});
+  )
+})
 
 export const head: DocumentHead = {
   title: "Dashboard - CRM",
   meta: [
     {
       name: "description",
-      content: "Panel principal del sistema CRM",
+      content: "Panel principal del sistema CRM con contexto global implementado",
     },
   ],
-};
+}

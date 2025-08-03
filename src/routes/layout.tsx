@@ -1,8 +1,10 @@
-import { component$, Slot } from "@builder.io/qwik"
-import { routeLoader$ } from "@builder.io/qwik-city"
+import { component$, Slot, useContextProvider, $ } from "@builder.io/qwik"
+import { routeLoader$, useNavigate } from "@builder.io/qwik-city"
 import Sidebar from "../components/Sidebar"
 import { Header } from "../components/HeaderNew"
 import { createServerSupabaseClient } from "../lib/supabase"
+import { AuthContext, type AuthContextValue } from "../lib/auth-context"
+import { createClient } from "../lib/supabase"
 
 /**
  * Helper function = Determinar si es una ruta de autenticación
@@ -25,7 +27,7 @@ export const useAuthLoader = routeLoader$(async (requestEvent) => {
   const supabase = createServerSupabaseClient(requestEvent)
   
   // ✅ SEGURO: getUser() verifica con el servidor Auth de Supabase
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   
   const pathname = requestEvent.url.pathname
   const isAuthRoute = isAuthenticationRoute(pathname)
@@ -52,10 +54,33 @@ export const useAuthLoader = routeLoader$(async (requestEvent) => {
  * Layout Global = Wrapper que envuelve TODAS las rutas
  * - Verificación de auth se hace en el servidor (sin flash)
  * - Renderiza UI diferente según el tipo de ruta
+ * - 🔥 PROVIDER: Contexto global de usuario disponible en toda la app
  */
 export default component$(() => {
   // Server-side auth verification (no flash!)
   const authState = useAuthLoader()
+  const nav = useNavigate()
+  
+  // 🎯 CONTEXT VALUE: Preparar valor optimizado para el contexto
+  const authContextValue: AuthContextValue = {
+    user: authState.value.user,
+    isAuthenticated: !!authState.value.user,
+    logout: $(async () => {
+      // 🚀 Logout optimizado con navegación automática
+      const supabase = createClient()
+      const { error } = await supabase.auth.signOut()
+      
+      if (!error) {
+        // ✅ Navegación client-side tras logout exitoso
+        nav('/login')
+      } else {
+        console.error('❌ Error en logout:', error.message)
+      }
+    })
+  }
+  
+  // 🔥 CONTEXT PROVIDER: Proveer contexto a TODA la aplicación
+  useContextProvider(AuthContext, authContextValue)
   
   // Usar el estado ya calculado en el servidor (más eficiente)
   const isAuthRoute = authState.value.isAuthRoute
