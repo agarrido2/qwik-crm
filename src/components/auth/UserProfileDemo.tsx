@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik"
-import { useAuth } from "../../features/auth/hooks/use-auth"
+import { useAuth } from "../../features/auth/hooks/use-auth-context"
 
 /**
  * 🎯 UserProfileCard Component

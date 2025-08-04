@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik"
-import { useAuthContext } from "../../features/auth/hooks/use-auth-context"
+import { useAuth } from "../../features/auth/hooks/use-auth-context"
 
 /**
  * 🚀 Header Component = Barra superior del dashboard (CONTEXT-POWERED)
@@ -13,7 +13,7 @@ import { useAuthContext } from "../../features/auth/hooks/use-auth-context"
  */
 export const Header = component$(() => {
   // 🔥 MAGIA DEL CONTEXTO: Acceso directo al estado global sin props
-  const auth = useAuthContext()
+  const auth = useAuth()
 
   return (
     <header class="bg-white shadow-sm border-b border-gray-200">
