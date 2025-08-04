@@ -5,8 +5,8 @@ echo
 
 # Verificar que el servidor esté corriendo
 echo "📡 Verificando servidor..."
-if curl -s http://localhost:5174 > /dev/null; then
-    echo "✅ Servidor corriendo en http://localhost:5174"
+if curl -s http://localhost:5173 > /dev/null; then
+    echo "✅ Servidor corriendo en http://localhost:5173"
 else
     echo "❌ Servidor no está corriendo. Iniciando..."
     bun dev &
@@ -15,10 +15,10 @@ fi
 
 echo
 echo "🔍 Rutas disponibles para probar:"
-echo "  • Landing page: http://localhost:5174/"
-echo "  • Login: http://localhost:5174/login"
-echo "  • Register: http://localhost:5174/register"
-echo "  • Dashboard (protegido): http://localhost:5174/dashboard"
+echo "  • Landing page: http://localhost:5173/"
+echo "  • Login: http://localhost:5173/login"
+echo "  • Register: http://localhost:5173/register"
+echo "  • Dashboard (protegido): http://localhost:5173/dashboard"
 
 echo
 echo "🧪 Flujo de prueba recomendado:"
@@ -37,5 +37,5 @@ echo "  Password: password123"
 
 echo
 echo "🎯 URLs directas para probar:"
-echo "  curl http://localhost:5174/dashboard"
+echo "  curl http://localhost:5173/dashboard"
 echo "  (Debería redirigir a login si no estás autenticado)"
