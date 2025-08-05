@@ -6,9 +6,9 @@
 
 # Development
 node_modules
-.env
-.env.*
-*.env
+# .env
+# .env.*
+# *.env
 
 # Cache
 .cache
