@@ -10,7 +10,29 @@ Un sistema CRM moderno construido con **Qwik** para máxima performance y escala
 - **Feature-based organization** - Separación por dominio de negocio
 - **Shared components system** - Reutilización máxima de componentes
 - **Configuration layer** - Configuración centralizada
-- **Route groups** - Organización semántica de rutas
+- **Route gr### **📚 Recursos**
+
+### **🔗 Links Útiles**
+- [Qwik Documentation](https://qwik.builder.io/)
+- [Supabase Docs](https://supabase.com/docs)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+
+### **📖 Base de Conocimiento AI (documents/)**
+> **Propósito**: Knowledge base especializada para transferencia de expertise entre agentes AI. Contenido reutilizable para cualquier proyecto.
+
+- [`documents/QWIK_MASTER_GUIDE.md`](./documents/QWIK_MASTER_GUIDE.md) - Expertise completo en Qwik/QwikCity
+- [`documents/PROJECT_ARCHITECTURE.md`](./documents/PROJECT_ARCHITECTURE.md) - Patrones de arquitectura clean
+- [`documents/DEVELOPMENT_WORKFLOW.md`](./documents/DEVELOPMENT_WORKFLOW.md) - Workflows y best practices
+- [`documents/AI_KNOWLEDGE_TRANSFER.md`](./documents/AI_KNOWLEDGE_TRANSFER.md) - Protocolos de transfer AI→AI
+
+**Stack de Expertise Actual**: Qwik, QwikCity, Supabase, Clean Code, Tailwind CSS  
+**Próximas Tecnologías**: Prisma ORM, Flowbite UI Framework
+
+### **🎓 Learning Resources**
+- [Qwik Course](https://qwik.builder.io/tutorial/)
+- [Supabase Auth](https://supabase.com/docs/guides/auth)
+- [TypeScript Best Practices](https://typescript-eslint.io/rules/)anización semántica de rutas
 
 ---
 
@@ -193,12 +215,10 @@ export const createServerClient = (request) => { ... }
 export interface AuthContextValue {
   user: User | null
   isAuthenticated: boolean
-  login: QRL<(email: string, password: string) => Promise<void>>
-  logout: QRL<() => Promise<void>>
-  loading: boolean
+  logout: QRL<() => Promise<void>>  // Solo logout, login manejado por server actions
 }
 
-// Uso en componentes
+// Uso en componentes con hook simplificado
 import { useAuth } from '~/features/auth'
 
 export default component$(() => {
@@ -315,12 +335,13 @@ export { UserProfileCard, QuickUserInfo } from './components/UserProfileDemo'
 ## 🔄 **Estado de Migración**
 
 ### **✅ Completado**
-- 🔐 Sistema de autenticación migrado a `features/auth/`
+- 🔐 Sistema de autenticación migrado a `features/auth/` con Context API global
 - 🎨 Componentes de layout migrados a `shared/components/`
 - ⚙️ Configuración migrada a `lib/database/`
 - 🛣️ Route groups implementados
 - 📤 Exports centralizados funcionando
 - 🧪 Build system funcionando
+- 📚 Documentación reestructurada y consolidada (32→4 archivos esenciales)
 
 ### **🔄 En Progreso**
 - 🧩 Migración de componentes legacy restantes
@@ -415,6 +436,7 @@ bun run build --verbose
 
 ### **🔗 Links Útiles**
 - [Qwik Documentation](https://qwik.builder.io/)
+- [⭐ Qwik API Reference](https://qwik.dev/api/) - **API completa de Qwik**
 - [Supabase Docs](https://supabase.com/docs)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
@@ -444,4 +466,4 @@ bun run build --verbose
 
 **🎉 ¡Tu Qwik CRM está listo para escalar!**
 
-*Documentación actualizada: 3 de agosto de 2025*
+*Documentación actualizada: 5 de agosto de 2025*
