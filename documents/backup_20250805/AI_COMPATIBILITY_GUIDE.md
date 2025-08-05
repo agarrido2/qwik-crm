@@ -7,7 +7,7 @@
 
 ## 🎯 **EXPECTATIVAS REALISTAS**
 
-### **✅ Alta Probabilidad de Éxito (80-90%):**
+### **✅ Alta Probabilidad de Éxito (90-95%):**
 - **Lectura de documentación:** Todos los modelos pueden procesar texto técnico
 - **Seguimiento de patterns:** Los patterns están claramente documentados
 - **Implementación básica:** Componentes simples siguiendo examples
@@ -43,8 +43,10 @@ Después de cada implementación, verificar:
 - [ ] Usa `component$()` syntax correctamente
 - [ ] Event handlers con `$` (onClick$, onSubmit$)
 - [ ] QRL functions para async operations
+- [ ] PropFunctions para props (funciones QRL para props)
 - [ ] TypeScript interfaces definidas
 - [ ] SOLID principles aplicados
+
 
 ### **3. Code Review Automático:**
 ```typescript

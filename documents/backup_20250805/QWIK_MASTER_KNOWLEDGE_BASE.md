@@ -437,21 +437,11 @@ bun run build --typecheck
 
 ## 📚 **REFERENCIAS OFICIALES**
 
-### **🔗 DOCUMENTACIÓN PRINCIPAL**
-- **[Qwik Docs](https://qwik.dev/docs/)** - Documentación completa
-- **[⭐ Qwik API Reference](https://qwik.dev/api/)** - **API COMPLETA** (consultar para funciones específicas)
-- **[QwikCity](https://qwik.dev/docs/qwikcity/)** - Meta-framework
-- **[FAQ Oficial](https://qwik.dev/docs/faq/)** - Preguntas frecuentes
-- **[Tutorial](https://qwik.dev/tutorial/)** - Aprendizaje interactivo
-- **[Concepts](https://qwik.dev/docs/concepts/)** - Conceptos fundamentales
-
-### **🛠️ RECURSOS DE DESARROLLO**
-- **[Best Practices](https://qwik.dev/docs/guides/best-practices/)** - Mejores prácticas oficiales
-- **[Troubleshooting](https://qwik.dev/docs/troubleshooting/)** - Solución de problemas
-- **[Deployment](https://qwik.dev/docs/deployments/)** - Opciones de deployment
-- **[Integrations](https://qwik.dev/docs/integrations/)** - Terceros (Supabase, etc.)
-
-> **⚠️ REGLA CRÍTICA**: Para cualquier duda específica sobre APIs, tipos o funciones de Qwik, SIEMPRE consultar primero: **https://qwik.dev/api/**
+- **Qwik Docs:** https://qwik.dev/docs/
+- **Qwik City:** https://qwik.dev/docs/qwikcity/
+- **FAQ Oficial:** https://qwik.dev/docs/faq/
+- **Tutorial:** https://qwik.dev/tutorial/
+- **Concepts:** https://qwik.dev/docs/concepts/
 
 ---
 
