@@ -1,7 +1,7 @@
 # 🤖 AI KNOWLEDGE TRANSFER - QWIK CRM
 
 **Versión:** 2.0 - Optimizado para transferencia entre modelos AI  
-**Fecha:** 5 de agosto de 2025  
+**Fecha:** 8 de agosto de 2025  
 **Propósito:** Instrucciones precisas para que cualquier modelo AI mantenga el nivel técnico
 
 ---
@@ -37,7 +37,7 @@ Después responde al test de validación antes de comenzar cualquier tarea.
    - **Respuesta esperada:** "routeLoader$ verifica user server-side → AuthProvider proporciona context global → componentes usan useAuth() hook → UI sincronizada con estado."
 
 4. **¿Cómo crear un nuevo componente siguiendo los patterns?**
-   - **Respuesta esperada:** "Interface props con readonly, component$<Props>, QRL para event handlers, exports centralizados en index.ts."
+   - **Respuesta esperada:** "Interface props con readonly, component$<Props>, PropFunction para function props y QRL para handlers internos, exports centralizados en index.ts."
 
 **Si no puedes responder correctamente, VUELVE A LEER la documentación.**
 
@@ -51,7 +51,7 @@ Después responde al test de validación antes de comenzar cualquier tarea.
 interface ComponentProps {
   readonly title: string
   readonly items?: readonly Item[]
-  readonly onAction$?: QRL<(id: string) => void>
+  readonly onAction$?: PropFunction<(id: string) => void>
 }
 
 export const Component = component$<ComponentProps>(({ 

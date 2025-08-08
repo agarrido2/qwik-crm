@@ -1,7 +1,7 @@
 # 🚀 DEVELOPMENT WORKFLOW - QWIK CRM
 
 **Versión:** 2.0 - Workflow Optimizado  
-**Fecha:** 5 de agosto de 2025  
+**Fecha:** 8 de agosto de 2025  
 **Propósito:** Guía práctica para desarrollo, testing y deployment
 
 ---
@@ -11,6 +11,7 @@
 ### **📦 COMANDOS ESENCIALES**
 
 #### **Desarrollo Diario**
+
 ```bash
 # Servidor de desarrollo
 bun dev                     # Puerto 5173 con HMR
@@ -27,6 +28,7 @@ bun type-check           # TypeScript validation
 ```
 
 #### **Setup Inicial**
+
 ```bash
 # 1. Clonar proyecto
 git clone <repository>
@@ -50,6 +52,7 @@ bun dev
 ### **📁 CREACIÓN DE NUEVAS FEATURES**
 
 #### **1. Feature Structure Template**
+
 ```bash
 # Crear nueva feature
 mkdir -p src/features/nueva-feature/{components,hooks,services,schemas}
@@ -69,6 +72,7 @@ src/features/nueva-feature/
 ```
 
 #### **2. Implementation Pattern**
+
 ```tsx
 // src/features/nueva-feature/index.ts
 export { ComponenteA, ComponenteB } from './components'
@@ -81,7 +85,7 @@ import { component$ } from "@builder.io/qwik"
 
 interface ComponenteAProps {
   readonly title: string
-  readonly onAction$?: QRL<() => void>
+  readonly onAction$?: PropFunction<() => void>
 }
 
 export const ComponenteA = component$<ComponenteAProps>(({ 
@@ -103,6 +107,7 @@ import { ComponenteA } from '~/features/nueva-feature'
 ### **🛣️ CREACIÓN DE RUTAS**
 
 #### **Route Pattern por Tipo**
+
 ```bash
 # Rutas públicas → (landing)
 src/routes/(landing)/nueva-pagina/index.tsx
@@ -115,6 +120,7 @@ src/routes/(crm)/nueva-seccion/index.tsx
 ```
 
 #### **Route Template**
+
 ```tsx
 // src/routes/(crm)/nueva-seccion/index.tsx
 import { component$ } from "@builder.io/qwik"
@@ -166,9 +172,10 @@ export const head: DocumentHead = {
 ### **🎨 COMPONENTES UI**
 
 #### **Component Template**
+
 ```tsx
 // src/shared/components/ui/Button.tsx
-import { component$, type QRL } from "@builder.io/qwik"
+import { component$, type PropFunction } from "@builder.io/qwik"
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger'
 type ButtonSize = 'sm' | 'md' | 'lg'
@@ -179,7 +186,7 @@ interface ButtonProps {
   readonly disabled?: boolean
   readonly loading?: boolean
   readonly type?: 'button' | 'submit' | 'reset'
-  readonly onClick$?: QRL<() => void>
+  readonly onClick$?: PropFunction<() => void>
   readonly children: any
 }
 
@@ -232,6 +239,7 @@ export const Button = component$<ButtonProps>(({
 ## 🧪 **TESTING STRATEGY**
 
 ### **📋 Testing Setup** (Próximamente)
+
 ```bash
 # Instalar testing dependencies
 bun add -d vitest @testing-library/qwik jsdom
@@ -249,6 +257,7 @@ export default defineConfig({
 ```
 
 ### **🧪 Test Patterns**
+
 ```tsx
 // tests/components/Button.test.tsx
 import { test, expect } from 'vitest'
@@ -272,6 +281,7 @@ test('Button calls onClick when clicked', async () => {
 ```
 
 ### **🔍 E2E Testing** (Próximamente)
+
 ```tsx
 // tests/e2e/auth.spec.ts
 import { test, expect } from '@playwright/test'
@@ -295,6 +305,7 @@ test('user can login and access dashboard', async ({ page }) => {
 ### **🐛 DEBUGGING PATTERNS**
 
 #### **Server-side Debugging**
+
 ```tsx
 // En routeLoader$ o routeAction$
 export const useDebugLoader = routeLoader$(async (requestEvent) => {
@@ -309,6 +320,7 @@ export const useDebugLoader = routeLoader$(async (requestEvent) => {
 ```
 
 #### **Client-side Debugging**
+
 ```tsx
 // En componentes
 export default component$(() => {
@@ -330,6 +342,7 @@ export default component$(() => {
 ### **❌ ERRORES COMUNES Y SOLUCIONES**
 
 #### **1. "Cannot find module" Errors**
+
 ```bash
 # ❌ Error común
 Error: Cannot find module '~/features/auth'
@@ -341,6 +354,7 @@ export { AuthContext } from './auth-context'
 ```
 
 #### **2. "routeLoader$ outside route boundary"**
+
 ```tsx
 // ❌ INCORRECTO
 const MyComponent = component$(() => {
@@ -356,6 +370,7 @@ export default component$(() => {
 ```
 
 #### **3. Context Provider Issues**
+
 ```tsx
 // ❌ Error: useContext returns undefined
 const auth = useContext(AuthContext) // undefined
@@ -366,6 +381,7 @@ useContextProvider(AuthContext, contextValue) // ✅ Required
 ```
 
 ### **🔧 DEBUG COMMANDS**
+
 ```bash
 # Verificar estructura
 find src -name "*.tsx" -o -name "*.ts" | grep -E "(index|component)" | head -10
@@ -385,6 +401,7 @@ bun run build && npx vite-bundle-analyzer dist/
 ## 🚢 **DEPLOYMENT**
 
 ### **🌐 PRODUCTION BUILD**
+
 ```bash
 # 1. Build optimizado
 bun run build
@@ -400,6 +417,7 @@ vercel deploy
 ```
 
 ### **⚙️ ENVIRONMENT VARIABLES**
+
 ```bash
 # .env.local (development)
 PUBLIC_SUPABASE_URL=your_supabase_url
@@ -411,6 +429,7 @@ PRIVATE_SUPABASE_SERVICE_KEY=your_service_key
 ```
 
 ### **📊 PRODUCTION CHECKLIST**
+
 - [ ] Environment variables configuradas
 - [ ] Build sin errores
 - [ ] Lighthouse score > 90
@@ -424,6 +443,7 @@ PRIVATE_SUPABASE_SERVICE_KEY=your_service_key
 ## 📈 **PERFORMANCE MONITORING**
 
 ### **🎯 METRICS TO TRACK**
+
 ```tsx
 // Performance monitoring
 useVisibleTask$(() => {
@@ -440,6 +460,7 @@ useVisibleTask$(() => {
 ```
 
 ### **⚡ OPTIMIZATION TIPS**
+
 1. **Lazy load heavy components** - `lazy$(() => import('./Heavy'))`
 2. **Use server actions** for data mutations
 3. **Minimize client-side state** - prefer server state
@@ -451,6 +472,7 @@ useVisibleTask$(() => {
 ## 🔄 **GIT WORKFLOW**
 
 ### **📝 COMMIT CONVENTIONS**
+
 ```bash
 # Conventional Commits format
 feat: add user dashboard component
@@ -462,6 +484,7 @@ test: add component unit tests
 ```
 
 ### **🌿 BRANCH STRATEGY**
+
 ```bash
 # Feature branches
 git checkout -b feature/nueva-caracteristica
@@ -479,6 +502,7 @@ git push origin hotfix/critical-fix
 ## 📚 **DOCUMENTATION WORKFLOW**
 
 ### **📝 DOCUMENTATION UPDATES**
+
 ```markdown
 # Al agregar nueva feature:
 1. Actualizar PROJECT_ARCHITECTURE.md con nuevos componentes
@@ -488,6 +512,7 @@ git push origin hotfix/critical-fix
 ```
 
 ### **🔄 KNOWLEDGE TRANSFER**
+
 ```bash
 # Para nuevos desarrolladores:
 1. Leer QWIK_MASTER_GUIDE.md
@@ -501,6 +526,7 @@ git push origin hotfix/critical-fix
 ## ✅ **QUALITY GATES**
 
 ### **🚦 PRE-COMMIT CHECKS**
+
 ```bash
 # Automated checks
 bun run lint        # ESLint pass
@@ -510,6 +536,7 @@ bun run test        # Tests pass (when implemented)
 ```
 
 ### **📊 DEFINITION OF DONE**
+
 - [ ] Feature implemented siguiendo patterns establecidos
 - [ ] TypeScript types definidos
 - [ ] Responsive design verificado

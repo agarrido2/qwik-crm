@@ -1,7 +1,7 @@
 # 🎯 QWIK MASTER GUIDE - GUÍA DEFINITIVA
 
 **Versión:** 2.0 - Consolidada y Verificada  
-**Fecha:** 5 de agosto de 2025  
+**Fecha:** 8 de agosto de 2025  
 **Propósito:** Guía completa y autoritativa sobre Qwik para desarrollo profesional
 
 ---
@@ -87,7 +87,7 @@ Qwik usa virtual DOM **estratégicamente**:
 
 ### **🛣️ FILE-BASED ROUTING**
 
-```
+```text
 src/routes/
 ├── layout.tsx                 // Layout global
 ├── index.tsx                  // Ruta raíz (/)
@@ -109,6 +109,7 @@ src/routes/
 ### **📊 DATA LOADING PATTERNS**
 
 #### **routeLoader$ - Server-side Data**
+
 ```tsx
 export const useUserData = routeLoader$(async (requestEvent) => {
   // Ejecuta ANTES del render en el servidor
@@ -130,6 +131,7 @@ export default component$(() => {
 ```
 
 #### **routeAction$ - Server Actions**
+
 ```tsx
 export const useLoginAction = routeAction$(async (formData, requestEvent) => {
   const supabase = createServerSupabaseClient(requestEvent)
@@ -462,7 +464,7 @@ useTask$(({ track }) => {
 interface ComponentProps {
   title: string
   items?: Item[]
-  onAction$?: QRL<(id: string) => void>
+  onAction$?: PropFunction<(id: string) => void>
 }
 
 export const MyComponent = component$<ComponentProps>(({ 
@@ -533,7 +535,7 @@ export const useActionName = routeAction$(async (formData, requestEvent) => {
 interface StrictProps {
   readonly id: string
   readonly data: readonly Item[]
-  readonly onUpdate$?: QRL<(item: Item) => Promise<void>>
+  readonly onUpdate$?: PropFunction<(item: Item) => Promise<void>>
 }
 
 // Union types para variants
@@ -545,7 +547,7 @@ interface ButtonProps {
   size?: ButtonSize
   disabled?: boolean
   children: any
-  onClick$?: QRL<() => void>
+  onClick$?: PropFunction<() => void>
 }
 ```
 

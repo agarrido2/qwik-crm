@@ -1,7 +1,7 @@
 # 🏗️ PROJECT ARCHITECTURE - QWIK CRM
 
 **Versión:** 2.0 - Arquitectura Consolidada  
-**Fecha:** 5 de agosto de 2025  
+**Fecha:** 8 de agosto de 2025  
 **Estado:** Producción - Arquitectura Verificada y Funcionando
 
 ---
@@ -302,7 +302,7 @@ interface ComponentProps {
   readonly title: string
   readonly items?: readonly Item[]
   readonly variant?: 'primary' | 'secondary'
-  readonly onAction$?: QRL<(id: string) => Promise<void>>
+  readonly onAction$?: PropFunction<(id: string) => Promise<void>>
 }
 
 export const Component = component$<ComponentProps>(({ 
