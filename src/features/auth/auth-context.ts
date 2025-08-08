@@ -1,4 +1,4 @@
-import { createContextId, type QRL } from "@builder.io/qwik"
+import { createContextId, type QRL, type Signal } from "@builder.io/qwik"
 import type { User } from "@supabase/supabase-js"
 
 /**
@@ -12,10 +12,11 @@ import type { User } from "@supabase/supabase-js"
 export interface AuthContextValue {
   /** Usuario actual verificado server-side con getUser() */
   user: User | null
-  
   /** Estado computed de autenticación para mejor legibilidad */
   isAuthenticated: boolean
-  
+  /** Señales reactivas para fine-grained updates (opcional) */
+  userSignal?: Signal<User | null>
+  isAuthenticatedSignal?: Signal<boolean>
   /** Función de logout lazy-loaded con QRL para performance óptima */
   logout: QRL<() => Promise<void>>
 }

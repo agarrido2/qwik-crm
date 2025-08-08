@@ -59,12 +59,14 @@ export const createServerSupabaseClient = (requestEvent: RequestEventCommon) => 
        * setAll = Método moderno para establecer múltiples cookies
        */
       setAll(cookiesToSet) {
+        const isHttps = (requestEvent as any).url?.protocol === 'https:' ||
+                        requestEvent.request.url.startsWith('https://')
         cookiesToSet.forEach(({ name, value, options }) => {
           if (requestEvent.cookie) {
             requestEvent.cookie.set(name, value, {
               path: '/',
               httpOnly: true,
-              secure: true,
+              secure: isHttps,
               sameSite: 'lax',
               maxAge: 60 * 60 * 24 * 365, // 1 año
               ...options

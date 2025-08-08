@@ -59,9 +59,21 @@ export const useAuth = () => {
   });
 
   return {
-    user: user.value,
-    isLoading: isLoading.value,
-    isAuthenticated: !!user.value,
+    // Reactive Signals (para uso avanzado y fine-grained reactivity)
+    userSignal: user,
+    isLoadingSignal: isLoading,
+
+    // Getters retro-compatibles (siguen siendo reactivos al leer .value)
+    get user() {
+      return user.value;
+    },
+    get isLoading() {
+      return isLoading.value;
+    },
+    get isAuthenticated() {
+      return !!user.value;
+    },
+
     logout,
   };
 };

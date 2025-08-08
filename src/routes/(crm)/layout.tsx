@@ -1,4 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik"
+import { routeLoader$ } from "@builder.io/qwik-city"
+import { createServerSupabaseClient } from "~/lib/database"
 
 /**
  * 🔐 CRM Layout - Simplificado
@@ -11,12 +13,29 @@ import { component$, Slot } from "@builder.io/qwik"
  * NOTA: Este layout es opcional ahora que el layout principal maneja todo
  * Se mantiene para futuras customizaciones específicas del CRM
  */
+/**
+ * SSR Guard específico del área CRM
+ * - Protege cualquier ruta dentro de `src/routes/(crm)/**`
+ * - Redirige a /login con redirectTo si no hay sesión
+ */
+export const useCrmGuard = routeLoader$(async (ev) => {
+  const supabase = createServerSupabaseClient(ev)
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    const redirectTo = ev.url.pathname + ev.url.search
+    throw ev.redirect(302, `/login?redirectTo=${encodeURIComponent(redirectTo)}`)
+  }
+
+  return { user }
+})
+
 export default component$(() => {
-  // La verificación de auth ya se hizo en el layout principal
-  // Si llegamos aquí, el usuario está autenticado
-  
+  // Ejecuta el guard (asegura protección SSR y dispone de `user` si se necesita)
+  useCrmGuard()
+
   return (
-    // Solo renderizar el contenido - el layout visual viene del AppLayout
+    // Solo renderizar el contenido - el layout visual viene del AppLayout global
     <Slot />
   )
 })
