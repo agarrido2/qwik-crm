@@ -1,6 +1,6 @@
 import { component$, useSignal, useTask$ } from '@builder.io/qwik'
 import { type DocumentHead, routeAction$, Form, z, zod$, Link } from '@builder.io/qwik-city'
-import { createServerSupabaseClient } from '~/lib/supabase'
+import { createServerSupabaseClient } from '~/lib/database'
 
 
 /**

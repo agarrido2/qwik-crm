@@ -1,6 +1,6 @@
 import { component$, useSignal } from "@builder.io/qwik";
 import {type DocumentHead, Form, routeAction$, routeLoader$, zod$ } from "@builder.io/qwik-city";
-import { createServerSupabaseClient } from "~/lib/supabase";
+import { createServerSupabaseClient } from "~/lib/database";
 import { authSchemas, validatePasswordMatch } from "~/features/auth/schemas/auth-schemas";
 import { withSupabase } from "~/features/auth/services/auth-helpers";
 

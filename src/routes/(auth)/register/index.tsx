@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik'
 import { Form, routeAction$, Link, z, zod$, type DocumentHead } from '@builder.io/qwik-city'
-import { createServerSupabaseClient } from '~/lib/supabase'
+import { createServerSupabaseClient } from '~/lib/database'
 
 
 // Server Action para registro usando routeAction$ con validación zod$
