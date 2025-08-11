@@ -77,11 +77,17 @@ export const AuthProvider = component$<AuthProviderProps>((props) => {
     state.isAuthenticated = !!props.user
   })
 
-  // Incluir logout en el store para exponerlo desde el contexto
-  // (QRL es serializable y apto para el store)
-  ;(state as any).logout = logout
+  // Proveer contexto con getters reactivos y logout fuera del store
+  const ctx: AuthContextValue = {
+    get user() {
+      return state.user
+    },
+    get isAuthenticated() {
+      return state.isAuthenticated
+    },
+    logout,
+  }
 
-  // Proveer el store directamente para máxima reactividad
-  useContextProvider(AuthContext, state as unknown as AuthContextValue)
+  useContextProvider(AuthContext, ctx)
   return <Slot />
 })

@@ -64,6 +64,7 @@ export default component$(() => {
   // useSignal = Estado reactivo (como useState en React)
   // Cambia cuando hay errores para forzar re-render del Form
   const formKey = useSignal(Date.now())
+  const showPassword = useSignal(false)
   
   /**
    * useTask$ = Hook reactivo que se ejecuta en servidor Y cliente
@@ -83,139 +84,143 @@ export default component$(() => {
   })
   
   return (
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-md w-full space-y-8">
-        <div class="text-center">
-          <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Wellcome back to CRM 👋
-          </h2>
-        <h3 class="font-semibold text-lg">Please sign in to continue</h3>
-        </div>
-        
-        {/* 
-          Form de Qwik = Progressive Enhancement
-          - Funciona sin JavaScript (server-side form submission)
-          - Con JS, se convierte en AJAX submission
-          - action={loginAction} conecta con el server action
-          - key={formKey.value} fuerza recrear componente cuando cambia
-        */}
-        <Form action={loginAction} class="mt-8 space-y-6" key={formKey.value}>
-          <div class="shadow-sm border border-gray-300 rounded-lg p-5 lg:p-7 flex flex-col gap-4">
-            <div>
-              <label for="email" class="sr-only">
-                Email
-              </label>
-              {/* 
-                Input SIN value prop = No mantiene estado entre submissions
-                name="email" = Se mapea automáticamente con zod$ schema
-                autoComplete = Mejora UX del browser
-              */}
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                class={`appearance-none rounded-md relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
-                  loginAction.value?.fieldErrors && 'email' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.email?.length ? 'border-red-300' : 'border-gray-300'
-                }`}
-                placeholder="email@email.com"
-              />
-              {/* Mostrar errores de campo específicos (validación zod$) */}
-              {loginAction.value?.fieldErrors && 'email' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.email && (
-                <p class="mt-1 text-sm text-red-600">
-                  {loginAction.value.fieldErrors.email[0]}
-                </p>
-              )}
-            </div>
-            <div>
-              <label for="password" class="sr-only">
-                Password
-              </label>
-              {/* Password input sin value = Seguridad y UX mejorados */}
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                class={`appearance-none rounded-md relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm ${
-                  loginAction.value?.fieldErrors && 'password' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.password?.length ? 'border-red-300' : 'border-gray-300'
-                }`}
-                placeholder="your-password here"
-              />
-              {loginAction.value?.fieldErrors && 'password' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.password && (
-                <p class="mt-1 text-sm text-red-600">
-                  {loginAction.value.fieldErrors.password[0]}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* 
-            formErrors = Errores globales del servidor (ej: credenciales inválidas)
-            fieldErrors = Errores específicos de campos (ej: email mal formateado)
-          */}
-          {loginAction.value?.formErrors && (
-            <div class="rounded-md bg-red-50 p-4">
-              <div class="flex">
-                <div class="ml-3">
-                  <h3 class="text-sm font-medium text-red-800">
-                    Error de autenticación
-                  </h3>
-                  <div class="mt-2 text-sm text-red-700">
-                    {loginAction.value.formErrors.map((error) => (
-                      <p key={error}>{error}</p>
-                    ))}
-                  </div>
-                </div>
+    <div class="min-h-screen bg-gray-50">
+      <div class="mx-auto max-w-7xl px-4 py-10 lg:py-16">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Left marketing panel */}
+          <div class="hidden lg:block text-gray-700">
+            <div class="mb-10">
+              <div class="text-3xl font-semibold tracking-wide">
+                <span class="text-gray-900">LU</span><span class="text-red-500">N</span><span class="text-gray-400">O</span>
               </div>
             </div>
-          )}
+            <h1 class="text-3xl font-semibold text-gray-900 mb-6">Build digital products with:</h1>
+            <div class="space-y-8">
+              <div>
+                <h3 class="text-lg font-medium text-gray-900">All-in-one tool</h3>
+                <p class="text-sm text-gray-600">Amazing features to make your life easier & work efficient</p>
+              </div>
+              <div>
+                <h3 class="text-lg font-medium text-gray-900">Easily add & manage your services</h3>
+                <p class="text-sm text-gray-600">It brings together your tasks, projects, timelines, files and more</p>
+              </div>
+            </div>
+            <div class="mt-12 flex items-center gap-6 text-sm text-gray-500">
+              <a href="#" class="hover:text-gray-700">Home</a>
+              <a href="#" class="hover:text-gray-700">About Us</a>
+              <a href="#" class="hover:text-gray-700">FAQs</a>
+            </div>
+            <div class="mt-6 flex items-center gap-4 text-gray-400">
+              <span class="sr-only">Twitter</span>
+              <span class="sr-only">Facebook</span>
+              <span class="sr-only">GitHub</span>
+              <span class="sr-only">YouTube</span>
+            </div>
+          </div>
 
-          <div>
-            {/* 
-              loginAction.isRunning = Estado automático de Qwik
-              - true mientras el server action se ejecuta
-              - false cuando termina (exitoso o error)
-              disabled previene múltiples submissions
-            */}
-            <button
-              type="submit"
-              disabled={loginAction.isRunning}
-              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {/* Conditional rendering basado en estado del action */}
-              {loginAction.isRunning ? (
-                <span class="flex items-center">
-                  {/* Loading spinner - solo se muestra durante submission */}
-                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Iniciando sesión...
-                </span>
-              ) : (
-                'Iniciar sesión'
+          {/* Right login card */}
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 lg:p-10">
+            <h2 class="text-2xl font-semibold text-center text-gray-900">Sign In</h2>
+            <p class="mt-1 text-center text-sm text-gray-500">Free access to our dashboard.</p>
+
+            {/* Google button (no funcionalidad) */}
+            <div class="mt-6 flex justify-center">
+              <button type="button" class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="h-4 w-4"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.158,7.961,3.039l5.657-5.657C33.64,6.053,29.083,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,16.108,18.961,14,24,14c3.059,0,5.842,1.158,7.961,3.039l5.657-5.657C33.64,6.053,29.083,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.155,35.091,26.715,36,24,36c-5.202,0-9.619-3.326-11.283-7.955l-6.532,5.025C9.568,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.793,2.237-2.231,4.215-4.103,5.683c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C35.851,40.355,44,34.5,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+                Sign in with Google
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div class="my-6">
+              <div class="flex items-center gap-4">
+                <div class="h-px flex-1 bg-gray-200" />
+                <span class="text-xs text-gray-400">OR</span>
+                <div class="h-px flex-1 bg-gray-200" />
+              </div>
+            </div>
+
+            {/* Form */}
+            <Form action={loginAction} key={formKey.value} class="space-y-5">
+              <div class="space-y-5">
+                <div>
+                  <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    class={`mt-1 block w-full rounded-md border px-3 py-2 text-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      loginAction.value?.fieldErrors && 'email' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.email?.length ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="name@example.com"
+                  />
+                  {loginAction.value?.fieldErrors && 'email' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.email && (
+                    <p class="mt-1 text-sm text-red-600">{loginAction.value.fieldErrors.email[0]}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                  <div class="mt-1 relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword.value ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      required
+                      class={`block w-full rounded-md border px-3 py-2 pr-10 text-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        loginAction.value?.fieldErrors && 'password' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.password?.length ? 'border-red-300' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter the password"
+                    />
+                    <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600" onClick$={() => (showPassword.value = !showPassword.value)} aria-label="Toggle password visibility">
+                      {showPassword.value ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M3.94 4.94a.75.75 0 011.06 0l10.06 10.06a.75.75 0 11-1.06 1.06l-1.821-1.822A8.967 8.967 0 0110 16c-4.478 0-8.268-2.943-9.542-7a9.05 9.05 0 012.92-4.295L3.94 4.94zm6.8 6.8l-1.48-1.48a2 2 0 002.12-2.12l1.48 1.48a4 4 0 01-2.12 2.12z"/><path d="M10 4c4.478 0 8.268 2.943 9.542 7a9.05 9.05 0 01-3.25 4.485l-1.086-1.086A7.466 7.466 0 0017.94 11C16.732 8.067 13.627 6 10 6a7.466 7.466 0 00-3.148.663L5.478 5.29A8.965 8.965 0 0110 4z"/></svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 4c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7s-8.268-2.943-9.542-7C1.732 6.943 5.522 4 10 4zm0 3a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                      )}
+                    </button>
+                  </div>
+                  {loginAction.value?.fieldErrors && 'password' in loginAction.value.fieldErrors && loginAction.value.fieldErrors.password && (
+                    <p class="mt-1 text-sm text-red-600">{loginAction.value.fieldErrors.password[0]}</p>
+                  )}
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                    Remember me
+                  </label>
+                  <Link href="/forgot-password" class="text-sm text-blue-600 hover:text-blue-500">Forgot Password?</Link>
+                </div>
+              </div>
+
+              {/* Global errors */}
+              {loginAction.value?.formErrors && (
+                <div class="rounded-md bg-red-50 p-4 text-sm text-red-700 border border-red-200">
+                  {loginAction.value.formErrors.map((error) => (
+                    <p key={error}>{error}</p>
+                  ))}
+                </div>
               )}
-            </button>
-          </div>
 
-          <div class="flex items-center justify-between text-sm">
-            <Link
-              href="/register"
-              class="font-medium text-blue-600 hover:text-blue-500"
-            >
-              ¿No tienes cuenta? Regístrate
-            </Link>
-            <Link
-              href="/forgot-password"
-              class="font-medium text-blue-600 hover:text-blue-500"
-            >
-              ¿Olvidaste tu contraseña?
-            </Link>
+              <button
+                type="submit"
+                disabled={loginAction.isRunning}
+                class="w-full rounded-md bg-gray-700 hover:bg-gray-800 text-white py-2.5 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loginAction.isRunning ? 'Signing in…' : 'SIGN IN'}
+              </button>
+
+              <p class="text-center text-sm text-gray-600">
+                Don’t have an account yet?{' '}
+                <Link href="/register" class="text-blue-600 hover:text-blue-500">Sign up here</Link>
+              </p>
+            </Form>
           </div>
-        </Form>
+        </div>
       </div>
     </div>
   )
