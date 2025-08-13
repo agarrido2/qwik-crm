@@ -1,8 +1,8 @@
 // 🏷️ Shared Types
 export type * from './auth'
 
-// 📊 CRM Types (to be created)
-// export type * from './crm'
+// 📊 Dashboard Types (to be created)
+// export type * from './dashboard'
 
 // 🌐 API Types (to be created)
 // export type * from './api'

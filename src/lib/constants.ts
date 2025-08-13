@@ -28,15 +28,14 @@ export const ROUTES = {
     resetPassword: '/reset-password',
   },
   
-  // CRM Application
-  crm: {
-    dashboard: '/dashboard',
-    clients: '/clients',
-    invoices: '/invoices',
-    kanban: '/kanban',
-    opportunities: '/opportunities',
-    reports: '/reports',
-    settings: '/settings',
+  // Dashboard Application
+  dashboard: {
+    home: '/dashboard',
+    clientes: '/dashboard/clientes',
+    oportunidades: '/dashboard/oportunidades',
+    actividades: '/dashboard/actividades',
+    reportes: '/dashboard/reportes',
+    configuracion: '/dashboard/configuracion',
   },
   
   // Admin Panel (future)

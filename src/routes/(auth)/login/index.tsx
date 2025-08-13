@@ -1,6 +1,7 @@
 import { component$, useSignal, useTask$ } from '@builder.io/qwik'
-import { type DocumentHead, routeAction$, Form, z, zod$, Link } from '@builder.io/qwik-city'
+import { type DocumentHead, routeAction$, Form, zod$, Link } from '@builder.io/qwik-city'
 import { createServerSupabaseClient } from '~/lib/database'
+import { authSchemas } from '~/features/auth'
 
 
 /**
@@ -51,10 +52,7 @@ export const useLoginAction = routeAction$(async (values, requestEvent) => {
     throw error
   }
 }, zod$({
-  // zod$ = Validación que ocurre ANTES de ejecutar la función
-  // Si falla validación, nunca se ejecuta la función principal
-  email: z.string().email('Por favor ingresa un email válido'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  ...authSchemas.login,
 }))
 
 export default component$(() => {
@@ -232,11 +230,11 @@ export default component$(() => {
  * Equivalente a <Head> en Next.js
  */
 export const head: DocumentHead = {
-  title: 'Login - CRM',
+  title: 'Login - Dashboard',
   meta: [
     {
       name: 'description',
-      content: 'Inicia sesión en el CRM',
+      content: 'Inicia sesión en el dashboard',
     },
   ],
 }

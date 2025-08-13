@@ -274,11 +274,12 @@ export const useAuthGuard = routeLoader$(async (requestEvent) => {
   // Verificación server-side
   const currentPath = requestEvent.url.pathname
   const isProtectedRoute = currentPath.startsWith('/dashboard')
-  const isAuthRoute = currentPath.startsWith('/auth')
+  const isAuthRoute = ['/login', '/register', '/forgot-password', '/reset-password']
+    .some((p) => currentPath.startsWith(p))
   
   // Redirects server-side (sin flash)
   if (isProtectedRoute && !user) {
-    throw requestEvent.redirect(302, '/auth/login')
+    throw requestEvent.redirect(302, '/login')
   }
   
   if (isAuthRoute && user) {

@@ -19,6 +19,7 @@ export const authSchemas = {
    * Register Schema = Email + Password + Confirmación
    */
   register: {
+    name: z.string().min(2, "El nombre es requerido"),
     email: z.string().email("Email inválido"),
     password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
     confirmPassword: z.string().min(6, "Confirma tu contraseña"),

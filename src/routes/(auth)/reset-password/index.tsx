@@ -1,8 +1,7 @@
 import { component$, useSignal } from "@builder.io/qwik";
-import {type DocumentHead, Form, routeAction$, routeLoader$, zod$ } from "@builder.io/qwik-city";
+import { type DocumentHead, Form, routeAction$, routeLoader$, zod$ } from "@builder.io/qwik-city";
 import { createServerSupabaseClient } from "~/lib/database";
-import { authSchemas, validatePasswordMatch } from "~/features/auth/schemas/auth-schemas";
-import { withSupabase } from "~/features/auth/services/auth-helpers";
+import { authSchemas, validatePasswordMatch, withSupabase } from "~/features/auth";
 
 /**
  * Schema de validación para reset password usando schemas centralizados
@@ -197,11 +196,11 @@ export default component$(() => {
  * Equivalente a <Head> en Next.js
  */
 export const head: DocumentHead = {
-  title: 'Login - CRM',
+  title: 'Restablecer contraseña - CRM',
   meta: [
     {
       name: 'description',
-      content: 'Inicia sesión en el CRM',
+      content: 'Cambia tu contraseña con un enlace de recuperación válido',
     },
   ],
 }

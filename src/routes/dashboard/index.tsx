@@ -80,7 +80,7 @@ export default component$(() => {
       {/* 📈 Quick Actions */}
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <a 
-          href="/clientes" 
+          href="/dashboard/clientes" 
           class="bg-white hover:bg-gray-50 rounded-lg border border-gray-200 p-4 transition-colors group"
         >
           <div class="flex items-center">
@@ -95,7 +95,7 @@ export default component$(() => {
         </a>
 
         <a 
-          href="/oportunidades" 
+          href="/dashboard/oportunidades" 
           class="bg-white hover:bg-gray-50 rounded-lg border border-gray-200 p-4 transition-colors group"
         >
           <div class="flex items-center">
@@ -110,7 +110,7 @@ export default component$(() => {
         </a>
 
         <a 
-          href="/actividades" 
+          href="/dashboard/actividades" 
           class="bg-white hover:bg-gray-50 rounded-lg border border-gray-200 p-4 transition-colors group"
         >
           <div class="flex items-center">
@@ -125,7 +125,7 @@ export default component$(() => {
         </a>
 
         <a 
-          href="/reportes" 
+          href="/dashboard/reportes" 
           class="bg-white hover:bg-gray-50 rounded-lg border border-gray-200 p-4 transition-colors group"
         >
           <div class="flex items-center">

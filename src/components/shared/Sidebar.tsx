@@ -18,11 +18,11 @@ export const Sidebar = component$(() => {
           - Preserva el estado de la app
           - Faster navigation que <a> tags
         */}
-        <Link href="/clientes" class="py-2 px-3 rounded hover:bg-gray-800">Clientes</Link>
-        <Link href="/oportunidades" class="py-2 px-3 rounded hover:bg-gray-800">Oportunidades</Link>
-        <Link href="/actividades" class="py-2 px-3 rounded hover:bg-gray-800">Actividades</Link>
-        <Link href="/reportes" class="py-2 px-3 rounded hover:bg-gray-800">Reportes</Link>
-        <Link href="/configuracion" class="py-2 px-3 rounded hover:bg-gray-800">Configuración</Link>
+        <Link href="/dashboard/clientes" class="py-2 px-3 rounded hover:bg-gray-800">Clientes</Link>
+        <Link href="/dashboard/oportunidades" class="py-2 px-3 rounded hover:bg-gray-800">Oportunidades</Link>
+        <Link href="/dashboard/actividades" class="py-2 px-3 rounded hover:bg-gray-800">Actividades</Link>
+        <Link href="/dashboard/reportes" class="py-2 px-3 rounded hover:bg-gray-800">Reportes</Link>
+        <Link href="/dashboard/configuracion" class="py-2 px-3 rounded hover:bg-gray-800">Configuración</Link>
       </nav>
     </aside>
   );

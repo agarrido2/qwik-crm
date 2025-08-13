@@ -114,7 +114,7 @@ export const usePageData = routeLoader$(async (requestEvent) => {
   
   // Auth verification server-side
   if (requiresAuth && !user) {
-    throw requestEvent.redirect(302, '/auth/login')
+    throw requestEvent.redirect(302, '/login')
   }
   
   return { user, data: 'server-verified' }
@@ -210,7 +210,7 @@ src/
 ```
 (landing)/   # Rutas públicas
 (auth)/      # Autenticación sin sidebar  
-(crm)/       # Aplicación protegida con layout completo
+dashboard/   # Aplicación protegida (segmento visible)
 ```
 
 ---

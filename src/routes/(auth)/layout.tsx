@@ -6,7 +6,7 @@ import { component$, Slot } from "@builder.io/qwik";
  */
 export default component$(() => {
   return (
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-200">
       <Slot />
     </div>
   );

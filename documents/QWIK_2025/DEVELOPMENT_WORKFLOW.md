@@ -115,14 +115,14 @@ src/routes/(landing)/nueva-pagina/index.tsx
 # Rutas de autenticación → (auth)  
 src/routes/(auth)/nueva-auth/index.tsx
 
-# Rutas protegidas → (crm)
-src/routes/(crm)/nueva-seccion/index.tsx
+# Rutas protegidas → dashboard (visible en URL)
+src/routes/dashboard/nueva-seccion/index.tsx
 ```
 
 #### **Route Template**
 
 ```tsx
-// src/routes/(crm)/nueva-seccion/index.tsx
+// src/routes/dashboard/nueva-seccion/index.tsx
 import { component$ } from "@builder.io/qwik"
 import { routeLoader$ } from "@builder.io/qwik-city"
 import { createServerSupabaseClient } from '~/lib/database'
@@ -133,7 +133,7 @@ export const useNuevaSeccionData = routeLoader$(async (requestEvent) => {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
-    throw requestEvent.redirect(302, '/auth/login')
+    throw requestEvent.redirect(302, '/login')
   }
   
   // Cargar datos específicos
@@ -287,7 +287,7 @@ test('Button calls onClick when clicked', async () => {
 import { test, expect } from '@playwright/test'
 
 test('user can login and access dashboard', async ({ page }) => {
-  await page.goto('/auth/login')
+  await page.goto('/login')
   
   await page.fill('[name="email"]', 'test@example.com')
   await page.fill('[name="password"]', 'password123')

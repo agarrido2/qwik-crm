@@ -51,11 +51,13 @@ src/
     │   ├── layout.tsx              # Auth layout
     │   ├── login/index.tsx         # Login page
     │   └── register/index.tsx      # Register page
-    └── (crm)/                      # CRM application
-        ├── layout.tsx              # CRM layout (Protected)
-        ├── dashboard/index.tsx     # Dashboard
+    └── dashboard/                  # Protected app (visible in URL)
+        ├── index.tsx               # Dashboard home
         ├── clientes/index.tsx      # Clients
-        └── reportes/index.tsx      # Reports
+        ├── oportunidades/index.tsx # Opportunities
+        ├── actividades/index.tsx   # Activities
+        ├── reportes/index.tsx      # Reports
+        └── configuracion/index.tsx # Settings
 ```
 
 ---
@@ -99,13 +101,12 @@ export const useAuthGuard = routeLoader$(async (requestEvent) => {
   const { data: { user } } = await supabase.auth.getUser()
   
   const currentPath = requestEvent.url.pathname
-  const isProtectedRoute = currentPath.startsWith('/dashboard') || 
-                          currentPath.startsWith('/crm')
-  const isAuthRoute = currentPath.startsWith('/auth')
+  const isProtectedRoute = currentPath.startsWith('/dashboard')
+  const isAuthRoute = ['/login','/register','/forgot-password','/reset-password'].includes(currentPath)
   
   // Server-side redirects (sin flash)
   if (isProtectedRoute && !user) {
-    throw requestEvent.redirect(302, '/auth/login')
+    throw requestEvent.redirect(302, '/login')
   }
   
   if (isAuthRoute && user) {
@@ -125,7 +126,7 @@ export default component$(() => {
     logout: $(async () => {
       const supabase = createClient()
       const { error } = await supabase.auth.signOut()
-      if (!error) nav('/auth/login')
+      if (!error) nav('/login')
     })
   }
   
@@ -255,9 +256,9 @@ export const Sidebar = component$(() => {
   
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { href: '/crm/clientes', label: 'Clientes', icon: '👥' },
-    { href: '/crm/oportunidades', label: 'Oportunidades', icon: '💼' },
-    { href: '/crm/reportes', label: 'Reportes', icon: '📈' }
+    { href: '/dashboard/clientes', label: 'Clientes', icon: '👥' },
+    { href: '/dashboard/oportunidades', label: 'Oportunidades', icon: '💼' },
+    { href: '/dashboard/reportes', label: 'Reportes', icon: '📈' }
   ]
   
   return (
@@ -329,7 +330,7 @@ export default component$(() => {
     <div class="landing-layout">
       <nav class="landing-nav">
         <Link href="/">Home</Link>
-        <Link href="/auth/login">Login</Link>
+        <Link href="/login">Login</Link>
       </nav>
       <Slot />
     </div>
@@ -351,13 +352,12 @@ export default component$(() => {
 })
 ```
 
-#### **CRM Routes - Protegidas con Layout Completo**
+#### **Dashboard Routes - Protegidas**
 ```tsx
-// src/routes/(crm)/layout.tsx
+// src/routes/dashboard/index.tsx
 export default component$(() => {
-  // La protección se maneja en el root layout
-  // Este layout solo añade structure específica de CRM si es necesario
-  return <Slot />
+  // La protección se maneja en el root layout (SSR guard)
+  return <div>Dashboard</div>
 })
 ```
 
@@ -387,14 +387,14 @@ export const useLoginAction = routeAction$(async (formData, requestEvent) => {
 
 #### **Protected Route Loaders**
 ```tsx
-// src/routes/(crm)/dashboard/index.tsx
+// src/routes/dashboard/index.tsx
 export const useDashboardData = routeLoader$(async (requestEvent) => {
   const supabase = createServerSupabaseClient(requestEvent)
   const { data: { user } } = await supabase.auth.getUser()
   
   // El user ya está verificado por useAuthGuard, pero doble check
   if (!user) {
-    throw requestEvent.redirect(302, '/auth/login')
+    throw requestEvent.redirect(302, '/login')
   }
   
   // Cargar datos específicos del dashboard

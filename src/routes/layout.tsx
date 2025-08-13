@@ -25,12 +25,18 @@ const isPublicRoute = (pathname: string): boolean => {
 }
 
 const isProtectedRoute = (pathname: string): boolean => {
-  return pathname.startsWith('/dashboard') ||
-         pathname.startsWith('/clientes') ||
-         pathname.startsWith('/oportunidades') ||
-         pathname.startsWith('/actividades') ||
-         pathname.startsWith('/reportes') ||
-         pathname.startsWith('/configuracion')
+  // Nueva estructura: todo lo protegido vive bajo /dashboard
+  return pathname.startsWith('/dashboard')
+}
+
+/**
+ * Rutas de autenticación (excluye la landing "/")
+ */
+const isAuthRoute = (pathname: string): boolean => {
+  return pathname.startsWith('/login') ||
+         pathname.startsWith('/register') ||
+         pathname.startsWith('/forgot-password') ||
+         pathname.startsWith('/reset-password')
 }
 
 /**
@@ -56,8 +62,8 @@ export const useAuthGuard = routeLoader$(async (requestEvent) => {
     throw requestEvent.redirect(302, `/login?redirectTo=${encodeURIComponent(pathname)}`)
   }
   
-  // Si está autenticado y trata de acceder a login → redirigir al dashboard
-  if (user && pathname.startsWith('/login')) {
+  // Si está autenticado y trata de acceder a páginas de auth → redirigir al dashboard
+  if (user && isAuthRoute(pathname)) {
     const redirectTo = requestEvent.url.searchParams.get('redirectTo') || '/dashboard';
     throw requestEvent.redirect(302, redirectTo)
   }

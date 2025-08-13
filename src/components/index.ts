@@ -20,7 +20,7 @@ export { default as Sidebar } from './shared/Sidebar'
 // export { Testimonials } from './landing/Testimonials' // 🔜 Por crear
 
 // 🔐 Auth Components (Autenticación)
-export { UserProfileCard, QuickUserInfo } from './auth/UserProfileDemo'
+export { UserProfileCard, QuickUserInfo } from '~/features/auth/components/UserProfileDemo'
 export { AuthProvider } from './auth/AuthProvider'
 
 // 📱 App Components (CRM, Kanban, Calendar, etc.)
