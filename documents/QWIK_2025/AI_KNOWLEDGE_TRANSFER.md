@@ -188,7 +188,7 @@ Después de cada código generado, verificar:
 ```
 src/
 ├── features/           # Domain logic por feature
-├── shared/components/  # Componentes reutilizables
+├── components/shared/  # Componentes reutilizables
 ├── lib/                # Configuration & utils
 └── routes/             # File-based routing con groups
 ```

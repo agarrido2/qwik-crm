@@ -4,7 +4,11 @@ import { createServerSupabaseClient } from '~/lib/database'
 import { authSchemas } from '~/features/auth'
 
 
-// Server Action para registro usando routeAction$ con validación zod$
+/**
+ * Server Action - SE EJECUTA SOLO EN EL SERVIDOR
+ * routeAction$ = Función que maneja form submissions en el servidor
+ * zod$ = Validación de esquemas que ocurre antes de ejecutar la función
+ */
 export const useRegisterAction = routeAction$(async (values, requestEvent) => {
   // Validación personalizada de contraseñas
   if (values.password !== values.confirmPassword) {
@@ -12,30 +16,49 @@ export const useRegisterAction = routeAction$(async (values, requestEvent) => {
       fieldErrors: {
         confirmPassword: ['Las contraseñas no coinciden']
       },
-      formErrors: []
+      formErrors: [],
+      timestamp: Date.now() // ✨ Clave para resetear formulario
     })
   }
 
+  // IMPORTANTE: Pasar requestEvent completo para manejo correcto de cookies
   const supabase = createServerSupabaseClient(requestEvent)
   
   try {
+    // Extraer y limpiar el nombre del usuario
     const name = (values as any).name?.toString().trim() || ''
-    const { error } = await supabase.auth.signUp({
+    
+    // Llamada a Supabase para registrar - esto ocurre en el servidor
+    const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
       options: {
-        data: name ? { name } : undefined,
+        data: name ? { name } : undefined, // Guardar nombre en metadatos
       }
     })
     
+    // Si hay un error explícito de Supabase, mostrarlo
     if (error) {
+      // requestEvent.fail() = Retorna error 400 con datos estructurados
       return requestEvent.fail(400, {
         fieldErrors: {},
-        formErrors: [error.message]
+        formErrors: [error.message],
+        timestamp: Date.now() // ✨ Fuerza re-render del formulario
       })
     }
     
-    // Registro exitoso
+    // Verificar si el usuario ya existe (Supabase devuelve user pero con identities vacío)
+    if (data?.user && (!data.user.identities || data.user.identities.length === 0)) {
+      return requestEvent.fail(400, {
+        fieldErrors: {
+          email: ['Este email ya está registrado']
+        },
+        formErrors: ['El email ya está en uso. Intenta iniciar sesión o recuperar tu contraseña.'],
+        timestamp: Date.now()
+      })
+    }
+    
+    // Registro exitoso - mostrar mensaje de confirmación
     return {
       success: true,
       message: 'Cuenta creada exitosamente. Revisa tu email para confirmar tu cuenta.'
@@ -44,24 +67,38 @@ export const useRegisterAction = routeAction$(async (values, requestEvent) => {
     console.error('Error en registro:', error)
     return requestEvent.fail(500, {
       fieldErrors: {},
-      formErrors: ['Error interno del servidor']
+      formErrors: ['Error interno del servidor'],
+      timestamp: Date.now()
     })
   }
 }, zod$({
-  ...authSchemas.register,
+  ...authSchemas.register, // Esquema centralizado con validación de name, email, password y confirmPassword
 }))
 
 export default component$(() => {
+  // useRegisterAction = Acceso al server action desde el componente
   const registerAction = useRegisterAction()
+  
+  // useSignal = Estado reactivo (como useState en React)
+  // Cambia cuando hay errores para forzar re-render del Form
   const formKey = useSignal(Date.now())
   const showPassword = useSignal(false)
   const showConfirmPassword = useSignal(false)
 
-  // Resetea el formulario cuando existan errores para limpiar estado
+  /**
+   * useTask$ = Hook reactivo que se ejecuta en servidor Y cliente
+   * ✅ Más eficiente que useVisibleTask$ para este caso
+   * ✅ No necesita esperar hidratación del cliente
+   * track() = Escucha cambios en valores específicos (reactividad)
+   */
   useTask$(({ track }) => {
+    // track() convierte registerAction.value en una dependencia reactiva
     track(() => registerAction.value)
+    
+    // Cuando hay errores, regenerar key del formulario
+    // Esto fuerza a Qwik a crear un nuevo Form component (limpia estado)
     if (registerAction.value?.formErrors || registerAction.value?.fieldErrors) {
-      formKey.value = Date.now()
+      formKey.value = Date.now() // ✨ Nuevo timestamp = nuevo Form
     }
   })
 
@@ -252,6 +289,11 @@ export default component$(() => {
   )
 })
 
+/**
+ * DocumentHead = SEO y metadatos para esta página
+ * Se ejecuta en el servidor y cliente
+ * Equivalente a <Head> en Next.js
+ */
 export const head: DocumentHead = {
   title: 'Register - Dashboard',
   meta: [

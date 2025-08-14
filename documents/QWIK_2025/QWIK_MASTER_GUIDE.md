@@ -95,7 +95,7 @@ src/routes/
 │   ├── layout.tsx            // Layout específico
 │   ├── login/index.tsx       // /login
 │   └── register/index.tsx    // /register
-├── (dashboard)/              // Route group protegido
+├── dashboard/                // Route group protegido
 │   ├── index.tsx             // /dashboard
 │   ├── users/
 │   │   ├── index.tsx         // /users

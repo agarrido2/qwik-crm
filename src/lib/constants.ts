@@ -5,9 +5,9 @@
  */
 
 export const APP_CONFIG = {
-  name: 'Qwik CRM',
+  name: 'Qwik Dashboard',
   version: '1.0.0',
-  description: 'Sistema CRM construido con Qwik para máxima performance',
+  description: 'Sistema Dashboard construido con Qwik para máxima performance',
 } as const
 
 /**
@@ -16,9 +16,6 @@ export const APP_CONFIG = {
 export const ROUTES = {
   // Landing Pages
   home: '/',
-  about: '/about',
-  pricing: '/pricing',
-  contact: '/contact',
   
   // Authentication
   auth: {
@@ -27,7 +24,7 @@ export const ROUTES = {
     forgotPassword: '/forgot-password',
     resetPassword: '/reset-password',
   },
-  
+    
   // Dashboard Application
   dashboard: {
     home: '/dashboard',
@@ -37,14 +34,6 @@ export const ROUTES = {
     reportes: '/dashboard/reportes',
     configuracion: '/dashboard/configuracion',
   },
-  
-  // Admin Panel (future)
-  admin: {
-    dashboard: '/admin',
-    users: '/admin/users',
-    system: '/admin/system',
-    analytics: '/admin/analytics',
-  }
 } as const
 
 /**
