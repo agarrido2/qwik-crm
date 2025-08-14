@@ -5,6 +5,64 @@ import { authSchemas } from '~/features/auth'
 
 
 /**
+ * Server Action para Google OAuth - SE EJECUTA SOLO EN EL SERVIDOR
+ * Maneja la redirección a Google OAuth para registro
+ */
+export const useGoogleRegisterAction = routeAction$(async (_, requestEvent) => {
+  const supabase = createServerSupabaseClient(requestEvent)
+  
+  try {
+    // Configurar la URL de redirección tras el registro exitoso
+    const redirectTo = requestEvent.url.searchParams.get('redirectTo') || '/dashboard'
+    const baseUrl = `${requestEvent.url.protocol}//${requestEvent.url.host}`
+    
+    // Iniciar flujo OAuth con Google
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${baseUrl}${redirectTo}`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    })
+
+    if (error) {
+      console.error('Google OAuth register error:', error.message)
+      return requestEvent.fail(400, {
+        fieldErrors: {},
+        formErrors: [error.message],
+        timestamp: Date.now()
+      })
+    }
+
+    // Redirigir a Google OAuth
+    if (data.url) {
+      throw requestEvent.redirect(302, data.url)
+    }
+
+    return requestEvent.fail(500, {
+      fieldErrors: {},
+      formErrors: ['Error al registrarse con Google - No se recibió URL'],
+      timestamp: Date.now()
+    })
+  } catch (error) {
+    // Si es una Response (redirect), re-lanzarla
+    if (error instanceof Response) {
+      throw error
+    }
+    
+    console.error('Google OAuth register unexpected error:', error)
+    return requestEvent.fail(500, {
+      fieldErrors: {},
+      formErrors: ['Error interno del servidor'],
+      timestamp: Date.now()
+    })
+  }
+})
+
+/**
  * Server Action - SE EJECUTA SOLO EN EL SERVIDOR
  * routeAction$ = Función que maneja form submissions en el servidor
  * zod$ = Validación de esquemas que ocurre antes de ejecutar la función
@@ -78,6 +136,8 @@ export const useRegisterAction = routeAction$(async (values, requestEvent) => {
 export default component$(() => {
   // useRegisterAction = Acceso al server action desde el componente
   const registerAction = useRegisterAction()
+  // useGoogleRegisterAction = Acceso al server action de Google OAuth
+  const googleRegisterAction = useGoogleRegisterAction()
   
   // useSignal = Estado reactivo (como useState en React)
   // Cambia cuando hay errores para forzar re-render del Form
@@ -142,13 +202,35 @@ export default component$(() => {
             <h2 class="text-2xl font-semibold text-center text-gray-900">Create Account</h2>
             <p class="mt-1 text-center text-sm text-gray-500">Free access to our dashboard.</p>
 
-            {/* Google button (no funcionalidad) */}
+            {/* Google OAuth Register */}
             <div class="mt-6 flex justify-center">
-              <button type="button" class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="h-4 w-4"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.158,7.961,3.039l5.657-5.657C33.64,6.053,29.083,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,16.108,18.961,14,24,14c3.059,0,5.842,1.158,7.961,3.039l5.657-5.657C33.64,6.053,29.083,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.155,35.091,26.715,36,24,36c-5.202,0-9.619-3.326-11.283-7.955l-6.532,5.025C9.568,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.793,2.237-2.231,4.215-4.103,5.683c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C35.851,40.355,44,34.5,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
-                Sign up with Google
-              </button>
+              <Form action={googleRegisterAction}>
+                <button 
+                  type="submit" 
+                  class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  disabled={googleRegisterAction.isRunning}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="h-4 w-4">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.158,7.961,3.039l5.657-5.657C33.64,6.053,29.083,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,16.108,18.961,14,24,14c3.059,0,5.842,1.158,7.961,3.039l5.657-5.657C33.64,6.053,29.083,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.155,35.091,26.715,36,24,36c-5.202,0-9.619-3.326-11.283-7.955l-6.532,5.025C9.568,39.556,16.227,44,24,44z"/>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.793,2.237-2.231,4.215-4.103,5.683c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C35.851,40.355,44,34.5,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                  </svg>
+                  {googleRegisterAction.isRunning ? 'Connecting...' : 'Sign up with Google'}
+                </button>
+              </Form>
             </div>
+
+            {/* Mostrar errores de Google OAuth si los hay */}
+            {googleRegisterAction.value?.formErrors && (
+              <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                <div class="text-sm text-red-600">
+                  {googleRegisterAction.value.formErrors.map((error, index) => (
+                    <p key={index}>{error}</p>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Divider */}
             <div class="my-6">
