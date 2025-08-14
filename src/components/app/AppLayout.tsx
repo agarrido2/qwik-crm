@@ -1,5 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik"
 import { Header, Sidebar } from "~/components"
+import { useAuth } from "~/features/auth"
 
 /**
  * 🏗️ AppLayout Component
@@ -12,13 +13,20 @@ import { Header, Sidebar } from "~/components"
  */
 
 export const AppLayout = component$(() => {
+  const auth = useAuth()
+  
+  // Usar el ID del usuario como clave para forzar re-mount del Header
+  const headerKey = auth.user?.id || 'anonymous'
+  
+
   return (
     <div class="flex h-screen bg-gray-100">
       {/* Sidebar = Navegación lateral */}
       <Sidebar />
       <div class="flex-1 flex flex-col overflow-hidden">
         {/* Header = Barra superior con info del usuario */}
-        <Header />
+        {/* Usar key para forzar re-mount cuando cambia el usuario */}
+        <Header key={headerKey} />
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
           <div class="container mx-auto px-6 py-8">
             {/* Slot = Contenido específico de cada ruta */}

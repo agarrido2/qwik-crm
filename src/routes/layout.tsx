@@ -55,6 +55,8 @@ export const useAuthGuard = routeLoader$(async (requestEvent) => {
   const isPublic = isPublicRoute(pathname)
   const isProtected = isProtectedRoute(pathname)
   
+
+  
   // LÓGICA DE PROTECCIÓN DE RUTAS
   
   // Si es una ruta protegida y no hay usuario → redirigir al login
@@ -83,8 +85,10 @@ export default component$(() => {
   const isPublic = authState.value.isPublic
   const user = authState.value.user
   
+
+  
   return (
-    <AuthProvider user={user}>
+    <AuthProvider key={`auth-${user?.id || 'anonymous'}`} user={user}>
       {/* 
         CONDITIONAL RENDERING basado en tipo de ruta
         - Rutas públicas (landing, auth): Solo el contenido (sin sidebar/header)

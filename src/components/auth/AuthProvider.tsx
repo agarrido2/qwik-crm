@@ -1,18 +1,17 @@
-import { component$, Slot, useContextProvider, $, useStore, useVisibleTask$, useTask$ } from "@builder.io/qwik"
-import { useNavigate, useLocation } from "@builder.io/qwik-city"
+import { component$, Slot, useContextProvider, $, useSignal, useVisibleTask$ } from "@builder.io/qwik"
+import { useNavigate } from "@builder.io/qwik-city"
 import { isBrowser } from "@builder.io/qwik/build"
 import { createClient } from "~/lib/database"
 import { AuthContext, type AuthContextValue } from "~/features/auth"
 import type { User } from "@supabase/supabase-js"
 
 /**
- * 🔐 AuthProvider Component
+ * AuthProvider Component
  * 
- * Responsabilidad única: Proveer contexto de autenticación global
- * - Envuelve toda la aplicación
- * - Provee estado de usuario y funciones auth
- * - Maneja logout con navegación automática
- * - Optimizado para Qwik (mínimo JavaScript)
+ * Provides authentication context using Qwik's reactive primitives:
+ * - useSignal for reactive user state
+ * - SSR initialization with client-side sync
+ * - Supabase auth event subscription
  */
 
 interface AuthProviderProps {
@@ -21,70 +20,47 @@ interface AuthProviderProps {
 
 export const AuthProvider = component$<AuthProviderProps>((props) => {
   const nav = useNavigate()
-  const loc = useLocation()
+  
+  // Initialize user signal with SSR props
+  const currentUser = useSignal<User | null>(props.user || null)
 
-  // Store SOLO para datos (serializable)
-  const state = useStore({
-    user: props.user as User | null,
-    isAuthenticated: !!props.user,
-  })
-
-  // QRL fuera del store (no serializar funciones dentro del store)
+  // Logout function
   const logout = $(async () => {
     const supabase = createClient()
     const { error } = await supabase.auth.signOut()
     if (!error) {
+      currentUser.value = null
       nav('/')
-    } else {
-      console.error('❌ Error en logout:', error?.message)
     }
   })
 
-  // Suscripción client-side a cambios de autenticación para refrescar el contexto sin recargar
+  // Client-side auth synchronization
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ cleanup }) => {
+    if (!isBrowser) return
+    
     const supabase = createClient()
 
-    // Hidratar estado inmediatamente al montar (caso: redirect tras login)
+    // Sync with current session on hydration
     supabase.auth.getUser().then(({ data }) => {
-      state.user = data.user ?? null
-      state.isAuthenticated = !!data.user
-    }).catch((err) => {
-      console.warn('No se pudo hidratar el usuario inicial:', err?.message)
+      const serverUser = data?.user ?? null
+      if (currentUser.value?.id !== serverUser?.id) {
+        currentUser.value = serverUser
+      }
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      state.user = session?.user ?? null
-      state.isAuthenticated = !!session?.user
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      currentUser.value = session?.user ?? null
     })
+
     cleanup(() => subscription.unsubscribe())
   }, { strategy: 'document-ready' })
 
-  // Re-hidratar en navegaciones client-side (p.ej., redirect desde server action)
-  useTask$(({ track }) => {
-    track(() => loc.url.href)
-    if (!isBrowser) return
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
-      state.user = data.user ?? null
-      state.isAuthenticated = !!data.user
-    }).catch(() => {})
-  })
-
-  // Sincronizar cambios del prop SSR 'user' (por routeLoader$) con el store
-  useTask$(({ track }) => {
-    track(() => props.user)
-    state.user = props.user as User | null
-    state.isAuthenticated = !!props.user
-  })
-
-  // Proveer contexto con getters reactivos y logout fuera del store
+  // Provide auth context
   const ctx: AuthContextValue = {
-    get user() {
-      return state.user
-    },
-    get isAuthenticated() {
-      return state.isAuthenticated
-    },
+    user: currentUser.value,
+    isAuthenticated: !!currentUser.value,
     logout,
   }
 

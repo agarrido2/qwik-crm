@@ -1,76 +1,64 @@
-import { component$ } from "@builder.io/qwik"
-import { useAuth } from "../../features/auth/hooks/use-auth-context"
+import { component$, useContext } from "@builder.io/qwik"
+import { AuthContext } from "~/features/auth"
 
 /**
- * 🚀 Header Component = Barra superior del dashboard (CONTEXT-POWERED)
+ * Header Component
  * 
- * ✨ NUEVA IMPLEMENTACIÓN con Context API:
- * - 🎯 Zero prop drilling - acceso directo al contexto global
- * - 🔥 Server-side data - usuario ya verificado en el servidor
- * - ⚡ Lazy loading - función logout se carga solo cuando se usa
- * - 🛡️ Type safety - TypeScript completo end-to-end
- * - 🎨 Clean architecture - separación de responsabilidades
+ * Displays user information and logout functionality.
+ * Consumes auth context for reactive user state.
  */
+
 export const Header = component$(() => {
-  // 🔥 MAGIA DEL CONTEXTO: Acceso directo al estado global sin props
-  const auth = useAuth()
+  const auth = useContext(AuthContext)
+  
+  const user = auth.user
+  const isAuthenticated = auth.isAuthenticated
+  const displayName = user?.user_metadata?.name || user?.email || 'Usuario'
+  const avatar = user?.user_metadata?.avatar_url
 
   return (
     <header class="bg-white shadow-sm border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-4">
-          
-          {/* 🎯 Left Section: Dashboard Title */}
-          <div>
-            <h1 class="text-lg font-semibold text-gray-900">
+        <div class="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div class="flex items-center">
+            <h1 class="text-xl font-semibold text-gray-900">
               CRM Dashboard
             </h1>
           </div>
-          
-          {/* 
-            🚀 Right Section: User Info (CONTEXT-POWERED)
-            
-            ✨ BENEFICIOS TÉCNICOS:
-            - No props necesarias - datos vienen del contexto
-            - Server-side verified - usuario ya validado
-            - Lazy logout - función se carga solo al hacer click
-            - Consistent UX - mismo estado en toda la app
-          */}
+
+          {/* User Info */}
           <div class="flex items-center space-x-4">
-            {auth.isAuthenticated && auth.user ? (
+            {isAuthenticated ? (
               <>
-                {/* 👤 User Avatar Placeholder */}
-                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span class="text-white text-sm font-medium">
-                    {auth.user.email?.charAt(0).toUpperCase() || 'U'}
+                <div class="flex items-center space-x-3">
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt="Avatar"
+                      width="32"
+                      height="32"
+                      class="h-8 w-8 rounded-full"
+                    />
+                  ) : (
+                    <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
+                      <span class="text-white text-sm font-medium">
+                        {displayName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <span class="text-sm font-medium text-gray-700">
+                    {displayName}
                   </span>
                 </div>
-                
-                {/* 📧 User Email */}
-                <div class="flex flex-col">
-                  <span class="text-sm font-medium text-gray-900">
-                    {auth.user.user_metadata?.full_name || 'Usuario'}
-                  </span>
-                  <span class="text-xs text-gray-500">
-                    {auth.user.email}
-                  </span>
-                </div>
-                
-                {/* 🚪 Logout Button (LAZY-LOADED) */}
                 <button
-                  onClick$={auth.logout}
-                  class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow-md"
-                  title="Cerrar sesión"
+                  onClick$={() => auth.logout()}
+                  class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                 >
-                  Salir
+                  Cerrar Sesión
                 </button>
               </>
-            ) : (
-              /* 🔒 Fallback: Usuario no autenticado (no debería pasar) */
-              <span class="text-sm text-gray-500">
-                No autenticado
-              </span>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
