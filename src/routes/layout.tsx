@@ -1,6 +1,7 @@
 import { component$, Slot } from "@builder.io/qwik"
 import { routeLoader$ } from "@builder.io/qwik-city"
-import { AuthProvider, AppLayout } from "~/components"
+import { AuthProvider } from "~/components/auth/AuthProvider"
+import { AppLayout } from "~/components/app/AppLayout"
 import { createServerSupabaseClient } from "~/lib/database"
 
 /**

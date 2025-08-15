@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import { UserProfileCard, QuickUserInfo } from "~/components";
+import { UserProfileCard, QuickUserInfo } from "~/features/auth/components/UserProfileDemo";
 
 /**
  * 🏠 Dashboard Principal

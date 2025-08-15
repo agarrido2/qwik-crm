@@ -1,5 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik"
-import { Header, Sidebar } from "~/components"
+import { Header } from "~/components/shared/Header"
+import Sidebar from "~/components/shared/Sidebar"
 import { useAuth } from "~/features/auth"
 
 /**
