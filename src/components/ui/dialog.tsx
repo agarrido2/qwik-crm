@@ -34,9 +34,8 @@ export const Dialog = component$<DialogProps>(({ open = false, onOpenChange$, cl
   return (
     <div
       class={cn(
-        'fixed inset-0 z-50 flex items-center justify-center',
-        'bg-black/80 backdrop-blur-sm',
-        'animate-in fade-in-0',
+        'fixed inset-0 z-50 flex items-center justify-center p-4',
+        'bg-black/50 backdrop-blur-sm',
         className
       )}
       onClick$={handleBackdropClick}
@@ -56,9 +55,8 @@ export const DialogContent = component$<DialogContentProps>(({ class: className 
   return (
     <div
       class={cn(
-        'relative w-full max-w-lg mx-4',
-        'bg-background border border-border rounded-lg shadow-lg',
-        'animate-in zoom-in-95 slide-in-from-bottom-2',
+        'relative w-full max-w-lg mx-auto',
+        'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl',
         'max-h-[90vh] overflow-y-auto',
         className
       )}
@@ -102,7 +100,7 @@ export interface DialogTitleProps {
 
 export const DialogTitle = component$<DialogTitleProps>(({ class: className }) => {
   return (
-    <h3 class={cn('text-lg font-semibold leading-none tracking-tight font-secondary', className)}>
+    <h3 class={cn('text-lg font-semibold leading-none tracking-tight font-secondary text-gray-900 dark:text-white', className)}>
       <Slot />
     </h3>
   )
@@ -114,7 +112,7 @@ export interface DialogDescriptionProps {
 
 export const DialogDescription = component$<DialogDescriptionProps>(({ class: className }) => {
   return (
-    <p class={cn('text-sm text-muted-foreground', className)}>
+    <p class={cn('text-sm text-gray-600 dark:text-gray-400', className)}>
       <Slot />
     </p>
   )

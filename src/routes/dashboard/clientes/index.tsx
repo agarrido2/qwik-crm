@@ -1,4 +1,4 @@
-import { component$, $ } from '@builder.io/qwik'
+import { component$, $, useSignal } from '@builder.io/qwik'
 import { 
   Button, 
   Card, 
@@ -13,7 +13,18 @@ import {
   AvatarFallback,
   Toast,
   ToastTitle,
-  ToastDescription
+  ToastDescription,
+  SimpleDropdown,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose
 } from '~/components/ui'
 
 // Datos de ejemplo para la tabla
@@ -63,36 +74,156 @@ const clientColumns = [
 ]
 
 export default component$(() => {
+  const showDialog = useSignal(false)
+  const selectedClient = useSignal<typeof sampleClients[0] | null>(null)
+
   return (
     <div class="p-6 max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div class="mb-8">
-        <h1 class="text-4xl font-bold text-foreground mb-2 font-secondary">DataTable Demo</h1>
+        <h1 class="text-4xl font-bold text-foreground mb-2 font-secondary">Clientes CRM</h1>
         <p class="text-muted-foreground font-primary text-lg">
-          Demostración del componente DataTable con datos de clientes
+          Gestión de clientes con Dropdown y Dialog integrados
         </p>
       </div>
 
-      {/* DataTable Demo */}
+      {/* DataTable con Dropdown Actions */}
       <Card>
-        <CardHeader>
+        <CardHeader class="flex flex-row items-center justify-between">
           <CardTitle>Lista de Clientes</CardTitle>
+          <div class="flex gap-2">
+            <Button onClick$={() => {
+              selectedClient.value = null
+              showDialog.value = true
+            }}>
+              Nuevo Cliente
+            </Button>
+            <SimpleDropdown triggerText="Acciones">
+              <DropdownMenuLabel>Gestión</DropdownMenuLabel>
+              <DropdownMenuItem onClick$={() => console.log('Exportar CSV')}>
+                📊 Exportar CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick$={() => console.log('Importar datos')}>
+                📥 Importar Datos
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Configuración</DropdownMenuLabel>
+              <DropdownMenuItem onClick$={() => console.log('Configurar columnas')}>
+                ⚙️ Configurar Columnas
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick$={() => console.log('Filtros avanzados')}>
+                🔍 Filtros Avanzados
+              </DropdownMenuItem>
+            </SimpleDropdown>
+          </div>
         </CardHeader>
         <CardContent>
           <DataTable 
             data={sampleClients}
-            columns={clientColumns}
+            columns={[
+              ...clientColumns,
+              {
+                id: 'acciones',
+                header: 'Acciones',
+                cell: $((value: any, row: any) => (
+                  <SimpleDropdown triggerText="•••" triggerClass="text-xs px-2">
+                    <DropdownMenuItem onClick$={() => {
+                      selectedClient.value = row
+                      showDialog.value = true
+                    }}>
+                      ✏️ Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick$={() => console.log('Ver detalles:', row.nombre)}>
+                      👁️ Ver Detalles
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick$={() => console.log('Eliminar:', row.nombre)} class="text-destructive">
+                      🗑️ Eliminar
+                    </DropdownMenuItem>
+                  </SimpleDropdown>
+                ))
+              }
+            ]}
             searchable={true}
             searchPlaceholder="Buscar clientes..."
             pagination={true}
             pageSize={3}
             sortable={true}
-            onRowClick$={(client) => {
-              console.log('Cliente seleccionado:', client)
+            selectable={true}
+            onSelectionChange$={(selectedRows) => {
+              console.log('Filas seleccionadas:', selectedRows.length, selectedRows)
             }}
           />
         </CardContent>
       </Card>
+
+      {/* Dialog para Crear/Editar Cliente */}
+      <Dialog open={showDialog.value} onOpenChange$={(open) => showDialog.value = open}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedClient.value ? 'Editar Cliente' : 'Nuevo Cliente'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedClient.value 
+                ? `Modificar los datos de ${selectedClient.value.nombre}`
+                : 'Crear un nuevo cliente en el sistema'
+              }
+            </DialogDescription>
+          </DialogHeader>
+
+          <div class="space-y-4 py-4">
+            <div class="space-y-2">
+              <label class="text-sm font-medium">Nombre</label>
+              <Input 
+                placeholder="Nombre completo" 
+                value={selectedClient.value?.nombre || ''}
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium">Email</label>
+              <Input 
+                type="email" 
+                placeholder="email@empresa.com"
+                value={selectedClient.value?.email || ''}
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium">Teléfono</label>
+              <Input 
+                placeholder="+34 600 000 000"
+                value={selectedClient.value?.telefono || ''}
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium">Estado</label>
+              <SimpleDropdown triggerText={selectedClient.value?.estado || 'Seleccionar estado'}>
+                <DropdownMenuItem onClick$={() => console.log('Estado: Activo')}>
+                  ✅ Activo
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick$={() => console.log('Estado: Inactivo')}>
+                  ❌ Inactivo
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick$={() => console.log('Estado: Pendiente')}>
+                  ⏳ Pendiente
+                </DropdownMenuItem>
+              </SimpleDropdown>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose onClick$={() => showDialog.value = false}>
+              Cancelar
+            </DialogClose>
+            <Button onClick$={() => {
+              console.log('Guardando cliente:', selectedClient.value?.nombre || 'Nuevo')
+              showDialog.value = false
+            }}>
+              {selectedClient.value ? 'Actualizar' : 'Crear'} Cliente
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Pruebas de Botones */}
       <Card>

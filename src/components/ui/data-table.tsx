@@ -1,8 +1,9 @@
-import { component$, useStore, $, type PropFunction } from '@builder.io/qwik'
+import { component$, useStore, useSignal, $, type PropFunction } from '@builder.io/qwik'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 import { Button } from './button'
 import { Input } from './input'
 import { Badge } from './badge'
+import { Checkbox } from './checkbox'
 
 // Función cn simple sin dependencias externas
 const cn = (...classes: (string | undefined)[]) => {
@@ -28,7 +29,9 @@ export interface DataTableProps<T = any> {
   pageSize?: number
   sortable?: boolean
   filterable?: boolean
+  selectable?: boolean
   onRowClick$?: PropFunction<(row: T) => void>
+  onSelectionChange$?: PropFunction<(selectedRows: T[]) => void>
   class?: string
 }
 
@@ -39,6 +42,8 @@ export interface DataTableState {
   currentPage: number
   pageSize: number
   filters: Record<string, string>
+  selectedRows: Set<number>
+  selectAll: boolean
 }
 
 export const DataTable = component$<DataTableProps>(({
@@ -49,8 +54,10 @@ export const DataTable = component$<DataTableProps>(({
   pagination = true,
   pageSize = 10,
   sortable = true,
+  selectable = false,
   // filterable = false, // TODO: Implementar filtros por columna
   onRowClick$,
+  onSelectionChange$,
   class: className
 }) => {
   const state = useStore<DataTableState>({
@@ -59,8 +66,13 @@ export const DataTable = component$<DataTableProps>(({
     sortDirection: 'asc',
     currentPage: 1,
     pageSize,
-    filters: {}
+    filters: {},
+    selectedRows: new Set<number>(),
+    selectAll: false
   })
+  
+  // Force reactivity trigger for Set operations
+  const forceUpdate = useSignal(0)
 
   // Filtrar datos por búsqueda
   const filteredData = data.filter(row => {
@@ -111,6 +123,46 @@ export const DataTable = component$<DataTableProps>(({
 
   const handlePageChange = $((page: number) => {
     state.currentPage = page
+  })
+
+  const handleSelectAll = $(() => {
+    if (state.selectAll) {
+      state.selectedRows.clear()
+      state.selectAll = false
+    } else {
+      // Seleccionar TODAS las filas de los datos
+      data.forEach((_, index) => {
+        state.selectedRows.add(index)
+      })
+      state.selectAll = true
+    }
+    
+    // Force UI update by triggering reactivity
+    forceUpdate.value++
+    
+    if (onSelectionChange$) {
+      const selectedData = Array.from(state.selectedRows).map(index => data[index])
+      onSelectionChange$(selectedData)
+    }
+  })
+
+  const handleRowSelect = $((rowIndex: number) => {
+    if (state.selectedRows.has(rowIndex)) {
+      state.selectedRows.delete(rowIndex)
+    } else {
+      state.selectedRows.add(rowIndex)
+    }
+    
+    // Force UI update by triggering reactivity
+    forceUpdate.value++
+    
+    // Update selectAll state - debe estar checked solo si TODAS las filas están seleccionadas
+    state.selectAll = data.length > 0 && data.every((_, index) => state.selectedRows.has(index))
+    
+    if (onSelectionChange$) {
+      const selectedData = Array.from(state.selectedRows).map(index => data[index])
+      onSelectionChange$(selectedData)
+    }
   })
 
   const renderCellValue = (column: Column, row: any) => {
@@ -164,6 +216,15 @@ export const DataTable = component$<DataTableProps>(({
         <Table>
           <TableHeader>
             <TableRow>
+              {selectable && (
+                <TableHead class="w-[50px]">
+                  <Checkbox
+                    checked={state.selectAll}
+                    onCheckedChange$={handleSelectAll}
+                    aria-label="Seleccionar todas las filas"
+                  />
+                </TableHead>
+              )}
               {columns.map((column) => {
                 const columnId = column.id // Extract the serializable value
                 return (
@@ -192,24 +253,39 @@ export const DataTable = component$<DataTableProps>(({
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <td class="h-24 text-center p-4 align-middle" colSpan={columns.length}>
+                <td class="h-24 text-center p-4 align-middle" colSpan={columns.length + (selectable ? 1 : 0)}>
                   No se encontraron resultados.
                 </td>
               </TableRow>
             ) : (
-              paginatedData.map((row, index) => (
-                <TableRow
-                  key={index}
-                  class={onRowClick$ ? 'cursor-pointer' : ''}
-                  onClick$={onRowClick$ ? $(() => onRowClick$(row)) : undefined}
-                >
-                  {columns.map((column) => (
-                    <TableCell key={column.id}>
-                      {renderCellValue(column, row)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              paginatedData.map((row, index) => {
+                const globalIndex = startIndex + index
+                return (
+                  <TableRow
+                    key={index}
+                    class={cn(
+                      onRowClick$ ? 'cursor-pointer' : '',
+                      state.selectedRows.has(globalIndex) ? 'bg-muted/50' : ''
+                    )}
+                    onClick$={onRowClick$ ? $(() => onRowClick$(row)) : undefined}
+                  >
+                    {selectable && (
+                      <TableCell>
+                        <Checkbox
+                          checked={state.selectedRows.has(globalIndex) && forceUpdate.value >= 0}
+                          onCheckedChange$={() => handleRowSelect(globalIndex)}
+                          aria-label={`Seleccionar fila ${index + 1}`}
+                        />
+                      </TableCell>
+                    )}
+                    {columns.map((column) => (
+                      <TableCell key={column.id}>
+                        {renderCellValue(column, row)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>

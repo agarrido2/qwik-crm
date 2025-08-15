@@ -1,19 +1,18 @@
 import { component$, Slot, useSignal, useTask$, $, type QRL } from '@builder.io/qwik'
 import { cn } from '~/lib/utils'
 
-export interface DropdownMenuProps {
+// Simple dropdown that manages its own state
+export interface SimpleDropdownProps {
   class?: string
+  triggerText: string
+  triggerClass?: string
 }
 
-export const DropdownMenu = component$<DropdownMenuProps>(({ class: className }) => {
+export const SimpleDropdown = component$<SimpleDropdownProps>(({ class: className, triggerText, triggerClass }) => {
   const isOpen = useSignal(false)
 
   const toggle = $(() => {
     isOpen.value = !isOpen.value
-  })
-
-  const close = $(() => {
-    isOpen.value = false
   })
 
   // Close on outside click
@@ -40,19 +39,60 @@ export const DropdownMenu = component$<DropdownMenuProps>(({ class: className })
 
   return (
     <div class={cn('relative inline-block text-left', className)} data-dropdown>
-      <DropdownMenuTrigger toggle={toggle} />
-      <DropdownMenuContent isOpen={isOpen.value} />
+      {/* Trigger Button */}
+      <button
+        type="button"
+        class={cn(
+          'inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900',
+          'shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50',
+          'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+          triggerClass
+        )}
+        onClick$={toggle}
+        aria-expanded={isOpen.value}
+        aria-haspopup="true"
+      >
+        {triggerText}
+        <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+        </svg>
+      </button>
+
+      {/* Dropdown Content */}
+      {isOpen.value && (
+        <div
+          class="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
+          role="menu"
+          aria-orientation="vertical"
+        >
+          <div class="py-1" role="none">
+            <Slot />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+})
+
+// Composable dropdown with separate components
+export interface DropdownMenuProps {
+  class?: string
+}
+
+export const DropdownMenu = component$<DropdownMenuProps>(({ class: className }) => {
+  return (
+    <div class={cn('relative inline-block text-left', className)}>
+      <Slot />
     </div>
   )
 })
 
 export interface DropdownMenuTriggerProps {
   class?: string
-  toggle?: QRL<() => void>
-  children?: any
+  onClick$?: QRL<() => void>
 }
 
-export const DropdownMenuTrigger = component$<DropdownMenuTriggerProps>(({ class: className, toggle, children }) => {
+export const DropdownMenuTrigger = component$<DropdownMenuTriggerProps>(({ class: className, onClick$ }) => {
   return (
     <button
       type="button"
@@ -62,11 +102,10 @@ export const DropdownMenuTrigger = component$<DropdownMenuTriggerProps>(({ class
         'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
         className
       )}
-      onClick$={toggle}
-      aria-expanded="true"
+      onClick$={onClick$}
       aria-haspopup="true"
     >
-      {children || <Slot />}
+      <Slot />
       <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
       </svg>
@@ -77,12 +116,11 @@ export const DropdownMenuTrigger = component$<DropdownMenuTriggerProps>(({ class
 export interface DropdownMenuContentProps {
   class?: string
   align?: 'start' | 'center' | 'end'
-  isOpen?: boolean
-  children?: any
+  show?: boolean
 }
 
-export const DropdownMenuContent = component$<DropdownMenuContentProps>(({ class: className, align = 'end', isOpen = false, children }) => {
-  if (!isOpen) return null
+export const DropdownMenuContent = component$<DropdownMenuContentProps>(({ class: className, align = 'end', show = false }) => {
+  if (!show) return null
 
   const alignClasses = {
     start: 'left-0',
@@ -102,7 +140,7 @@ export const DropdownMenuContent = component$<DropdownMenuContentProps>(({ class
       aria-orientation="vertical"
     >
       <div class="py-1" role="none">
-        {children || <Slot />}
+        <Slot />
       </div>
     </div>
   )
