@@ -64,6 +64,8 @@
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
-    "postgres": "^3.4.7"
+    "clsx": "^2.1.1",
+    "postgres": "^3.4.7",
+    "tailwind-merge": "^3.3.1"
   }
 }

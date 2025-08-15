@@ -1,69 +1,89 @@
-# Qwik City App ⚡️
+# 🚀 Qwik CRM - Sistema de Gestión de Clientes
 
-- [Qwik Docs](https://qwik.dev/)
-- [Discord](https://qwik.dev/chat)
-- [Qwik GitHub](https://github.com/QwikDev/qwik)
-- [@QwikDev](https://twitter.com/QwikDev)
-- [Vite](https://vitejs.dev/)
+Un CRM moderno construido con **Qwik**, **QwikUI**, **Supabase** y **Drizzle ORM**.
 
----
+## ✨ Estado Actual del Proyecto
 
-## Project Structure
+### 🎯 Componentes Implementados
+- ✅ **DataTable** - Tabla avanzada con búsqueda, ordenamiento y paginación
+- ✅ **Button** - Componente con múltiples variantes y tamaños
+- ✅ **Card** - Sistema de tarjetas para contenido
+- ✅ **Input** - Campos de entrada con validación
+- ✅ **Avatar** - Componente para imágenes de perfil
+- ✅ **Badge** - Etiquetas de estado
+- ✅ **Toast** - Sistema de notificaciones
+- ✅ **Table** - Componente base de tabla
 
-This project is using Qwik with [QwikCity](https://qwik.dev/qwikcity/overview/). QwikCity is just an extra set of tools on top of Qwik to make it easier to build a full site, including directory-based routing, layouts, and more.
+### 🎨 Sistema de Diseño
+- **Tipografía**: Roboto (principal) + Lufga (cabeceras)
+- **Framework**: QwikUI (headless components)
+- **Estilos**: Tailwind CSS v4
+- **Iconos**: Lucide Icons
+- **Temas**: Sistema de variables CSS
 
-Inside your project, you'll see the following directory structure:
+### 🛠 Stack Tecnológico
+- **Frontend**: Qwik + QwikCity
+- **UI**: QwikUI (shadcn/ui approach)
+- **Backend**: Supabase
+- **Database**: PostgreSQL + Drizzle ORM
+- **Auth**: Supabase Auth + Google OAuth
+- **Deployment**: Netlify/Vercel ready
 
-```
-├── public/
-│   └── ...
-└── src/
-    ├── components/
-    │   └── ...
-    └── routes/
-        └── ...
-```
+## 🚀 Scripts de Desarrollo
 
-- `src/routes`: Provides the directory-based routing, which can include a hierarchy of `layout.tsx` layout files, and an `index.tsx` file as the page. Additionally, `index.ts` files are endpoints. Please see the [routing docs](https://qwik.dev/qwikcity/routing/overview/) for more info.
+### Push Seguro a GitHub
+```bash
+# Script completo con verificaciones
+./scripts/safe-push.sh "mensaje del commit"
 
-- `src/components`: Recommended directory for components.
-
-- `public`: Any static assets, like images, can be placed in the public directory. Please see the [Vite public directory](https://vitejs.dev/guide/assets.html#the-public-directory) for more info.
-
-## Add Integrations and deployment
-
-Use the `bun qwik add` command to add additional integrations. Some examples of integrations includes: Cloudflare, Netlify or Express Server, and the [Static Site Generator (SSG)](https://qwik.dev/qwikcity/guides/static-site-generation/).
-
-```shell
-bun qwik add # or `bun qwik add`
-```
-
-## Development
-
-Development mode uses [Vite's development server](https://vitejs.dev/). The `dev` command will server-side render (SSR) the output during development.
-
-```shell
-npm start # or `bun start`
+# Script rápido
+./scripts/quick-push.sh "mensaje del commit"
 ```
 
-> Note: during dev mode, Vite may request a significant number of `.js` files. This does not represent a Qwik production build.
+### Comandos de Desarrollo
+```bash
+# Desarrollo
+bun dev
 
-## Preview
+# Build
+bun build
 
-The preview command will create a production build of the client modules, a production build of `src/entry.preview.tsx`, and run a local server. The preview server is only for convenience to preview a production build locally and should not be used as a production server.
+# Preview
+bun preview
 
-```shell
-bun preview # or `bun preview`
+# Base de datos
+bun db:generate  # Generar migraciones
+bun db:push      # Aplicar cambios
 ```
 
-## Production
-
-The production build will generate client and server modules by running both client and server build commands. The build command will use Typescript to run a type check on the source code.
-
-```shell
-bun build # or `bun build`
+## 📁 Estructura del Proyecto
 
 ```
+├── src/
+│   ├── components/
+│   │   ├── ui/           # Componentes QwikUI
+│   │   ├── auth/         # Componentes de autenticación
+│   │   └── app/          # Componentes específicos del CRM
+│   ├── routes/
+│   │   ├── (auth)/       # Rutas de autenticación
+│   │   └── dashboard/    # Panel principal del CRM
+│   ├── hooks/            # Hooks personalizados
+│   ├── lib/              # Utilidades y configuración
+│   └── assets/           # CSS y fuentes
+├── drizzle/              # Schema y migraciones
+├── scripts/              # Scripts de automatización
+└── docs/                 # Documentación del proyecto
+```
+
+## 🎯 Próximos Componentes
+- [ ] Dialog/Modal - Para formularios y confirmaciones
+- [ ] Dropdown Menu - Para acciones contextuales
+- [ ] Form Components - Textarea, Select, Checkbox, Radio
+- [ ] Tabs - Para organización de contenido
+
+## 📖 Documentación Completa
+
+Para desarrollo con IA, lee estos archivos en orden:
 
 # ESTO HAY QUE DECIRLE A LA IA PARA QUE ESTE AL DIA.
 🎯 Lee completamente estos archivos en orden:
