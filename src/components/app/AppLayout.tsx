@@ -1,6 +1,6 @@
 import { component$, Slot, useSignal, $ } from '@builder.io/qwik'
 import { SidebarLeft } from '../shared/sidebar-left'
-import { Header } from '../shared/Header'
+import { Header } from '../shared/header'
 
 /**
  * 🏗️ AppLayout Component

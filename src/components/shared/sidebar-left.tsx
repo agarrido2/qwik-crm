@@ -9,7 +9,7 @@ import { component$, useStore, useSignal, $, type PropFunction } from '@builder.
 import { useLocation } from '@builder.io/qwik-city'
 import { CompanyLogo } from './company-logo'
 import { sidebarData, type SidebarItem } from './sidebar-data'
-import { NavLink } from '../ui/nav-link'
+import { NavLink, Button, Badge } from '../ui'
 
 // Función cn simple sin dependencias externas
 const cn = (...classes: (string | undefined)[]) => {
@@ -77,9 +77,9 @@ export const SidebarLeft = component$<SidebarLeftProps>(({
             <span class="text-base">{item.icon}</span>
             <span class="font-medium">{item.title}</span>
             {item.badge && (
-              <span class="px-2 py-0.5 text-xs bg-red-100 text-red-600 rounded-full">
+              <Badge variant="destructive" class="bg-red-100 text-red-600">
                 {item.badge}
-              </span>
+              </Badge>
             )}
           </div>
           
@@ -107,9 +107,9 @@ export const SidebarLeft = component$<SidebarLeftProps>(({
             <span class="text-base">{item.icon}</span>
             <span class="font-medium">{item.title}</span>
             {item.badge && (
-              <span class="px-2 py-0.5 text-xs bg-red-100 text-red-600 rounded-full">
+              <Badge variant="destructive" class="bg-red-100 text-red-600">
                 {item.badge}
-              </span>
+              </Badge>
             )}
           </NavLink>
         )}
@@ -160,20 +160,26 @@ export const SidebarLeft = component$<SidebarLeftProps>(({
         {/* Selector de proyecto con botón + */}
         <div class="p-4">
           <div class="flex items-center gap-3">
-            <button
-              class="flex items-center justify-between flex-1 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            <Button
+              variant="outline"
+              size="sm"
+              class="flex items-center justify-between flex-1 text-gray-700 bg-gray-50"
               onClick$={() => {
                 // TODO: Implementar dropdown de proyectos
               }}
             >
               <span>{selectedProject.value}</span>
               <span class="text-gray-400">▼</span>
-            </button>
+            </Button>
             
             {/* Botón + */}
-            <button class="flex items-center justify-center w-10 h-10 bg-purple-600 text-white rounded-full hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors">
+            <Button
+              variant="default"
+              size="sm"
+              class="w-10 h-10 bg-purple-600 hover:bg-purple-700 rounded-full p-0"
+            >
               <span class="text-lg font-bold">+</span>
-            </button>
+            </Button>
           </div>
         </div>
       
@@ -199,18 +205,18 @@ export const SidebarLeft = component$<SidebarLeftProps>(({
         {/* Footer con iconos */}
         <div class="flex items-center justify-center p-4 border-t border-gray-200">
           <div class="flex items-center gap-4">
-            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <Button variant="ghost" size="sm" class="p-2 text-gray-400 hover:text-gray-600">
               📅
-            </button>
-            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            </Button>
+            <Button variant="ghost" size="sm" class="p-2 text-gray-400 hover:text-gray-600">
               💬
-            </button>
-            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            </Button>
+            <Button variant="ghost" size="sm" class="p-2 text-gray-400 hover:text-gray-600">
               💬
-            </button>
-            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            </Button>
+            <Button variant="ghost" size="sm" class="p-2 text-gray-400 hover:text-gray-600">
               🔄
-            </button>
+            </Button>
           </div>
         </div>
       </aside>

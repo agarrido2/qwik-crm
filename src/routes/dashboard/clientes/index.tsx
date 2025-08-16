@@ -253,6 +253,7 @@ export default component$(() => {
               <Button size="lg">Grande</Button>
               <Button size="xl">Extra Grande</Button>
               <Button size="icon">🔍</Button>
+              <Button size="default" class="bg-red-500 text-white rounded-full">+</Button>
             </div>
           </div>
 

@@ -21,19 +21,19 @@ export const CompanyLogo = component$<CompanyLogoProps>(({
   return (
     <div class={`${baseClasses} ${className || ''}`}>
       {/* Logo Icon */}
-      <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg shadow-lg">
-        <span class="text-white text-xl font-bold">L</span>
+      <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full shadow-lg bg-gradient-to-br from-purple-600 to-purple-800">
+        <span class="text-white text-xl font-bold">Q</span>
       </div>
       
       {/* Company Name */}
       {variant !== 'icon-only' && (
         <div class="flex flex-col">
           <span class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-            LUNO
+            Qwik
           </span>
           {variant === 'full' && (
             <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">
-              Admin
+              Car
             </span>
           )}
         </div>

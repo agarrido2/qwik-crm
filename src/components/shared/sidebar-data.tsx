@@ -28,6 +28,13 @@ export const sidebarData: SidebarSection[] = [
     title: "MAIN",
     items: [
       {
+        id: "menu-admin",
+        title: "Administración de Menú",
+        icon: "🎛️",
+        path: "/menu-admin",
+        badge: "ADMIN"
+      },
+      {
         id: "dashboard",
         title: "My Dashboard",
         icon: "🏠",
