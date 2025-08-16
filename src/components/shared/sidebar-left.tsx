@@ -6,9 +6,10 @@
  */
 
 import { component$, useStore, useSignal, $, type PropFunction } from '@builder.io/qwik'
-import { Link, useLocation } from '@builder.io/qwik-city'
+import { useLocation } from '@builder.io/qwik-city'
 import { CompanyLogo } from './company-logo'
 import { sidebarData, type SidebarItem } from './sidebar-data'
+import { NavLink } from '../ui/nav-link'
 
 // Función cn simple sin dependencias externas
 const cn = (...classes: (string | undefined)[]) => {
@@ -92,15 +93,14 @@ export const SidebarLeft = component$<SidebarLeftProps>(({
           )}
         </div>
         
-        {/* Link wrapper si tiene path */}
+        {/* NavLink wrapper si tiene path */}
         {item.path && !hasChildren && (
-          <Link
+          <NavLink
             href={item.path}
+            activeClass="bg-red-50 text-red-600 border-r-2 border-red-600"
+            inactiveClass="text-gray-700 hover:bg-gray-100 hover:text-gray-900"
             class={cn(
-              'flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group',
-              isActive 
-                ? 'bg-red-50 text-red-600 border-r-2 border-red-600' 
-                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              'flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group'
             )}
             style={`padding-left: ${paddingLeft}px`}
           >
@@ -111,7 +111,7 @@ export const SidebarLeft = component$<SidebarLeftProps>(({
                 {item.badge}
               </span>
             )}
-          </Link>
+          </NavLink>
         )}
         
         {/* Subitems */}

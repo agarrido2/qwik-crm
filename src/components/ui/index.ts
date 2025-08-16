@@ -6,6 +6,8 @@ export { Badge, type BadgeProps } from './badge'
 export { DataTable, type DataTableProps, type Column } from './data-table'
 export { Toast, ToastTitle, ToastDescription, type ToastProps } from './toast'
 export { Toaster } from './toaster'
+export { useToast } from '../../hooks/use-toast'
+export { NavLink } from './nav-link'
 export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow, type TableProps, type TableBodyProps, type TableCaptionProps, type TableCellProps, type TableFooterProps, type TableHeadProps, type TableHeaderProps, type TableRowProps } from './table'
 
 // Dialog & Modal Components

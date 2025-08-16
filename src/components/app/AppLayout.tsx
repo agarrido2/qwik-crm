@@ -34,32 +34,47 @@ export const AppLayout = component$(() => {
         {/* Header */}
         <Header onToggleSidebar$={toggleSidebar} />
         
-        {/* Page content */}
-        <main class={[
-          "flex-1 overflow-auto transition-all duration-300",
-          // Mobile: Compact padding
-          "p-4",
-          // Tablet: Standard padding
-          "sm:p-6",
-          // Laptop: Standard padding with collapsed sidebar space
-          "lg:p-8",
-          // Desktop: Generous padding with full sidebar
-          "xl:p-8"
+        {/* Content wrapper with sidebar spacing */}
+        <div class={[
+          "flex-1 overflow-hidden transition-all duration-300",
+          // Mobile: No left margin (sidebar is overlay)
+          "ml-0",
+          // Tablet: No left margin (sidebar is overlay)
+          "sm:ml-0",
+          // Laptop: Left margin for collapsed sidebar
+          "lg:ml-1",
+          "lg:mt-1",
+          // Desktop: Left margin for full sidebar
+          "xl:ml-2",
+          "xl:mt-2"
         ]}>
-          <div class={[
-            "w-full max-w-none transition-all duration-300",
-            // Mobile: Full width
-            "mx-0",
-            // Tablet: Slight margins
-            "sm:mx-2",
-            // Laptop: Standard container
-            "lg:mx-4",
-            // Desktop: Generous container
-            "xl:mx-6"
+          {/* Page content */}
+          <main class={[
+            "h-full overflow-y-auto bg-gray-100 overflow-x-hidden transition-all duration-300 custom-scrollbar",
+            // Mobile: Compact padding
+            "p-4",
+            // Tablet: Standard padding
+            "sm:p-6",
+            // Laptop: Standard padding
+            "lg:p-8",
+            // Desktop: Generous padding
+            "xl:p-8"
           ]}>
-            <Slot />
-          </div>
-        </main>
+            <div class={[
+              "w-full max-w-none transition-all duration-300",
+              // Mobile: Full width
+              "mx-0",
+              // Tablet: Slight margins
+              "sm:mx-2",
+              // Laptop: Standard container
+              "lg:mx-4",
+              // Desktop: Generous container
+              "xl:mx-6"
+            ]}>
+              <Slot />
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   )

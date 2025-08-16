@@ -12,7 +12,7 @@ const inputVariants = cva(
     variants: {
       variant: {
         default: 'border-input focus-visible:ring-ring',
-        destructive: 'border-destructive text-destructive focus-visible:ring-destructive placeholder:text-destructive/70',
+        destructive: 'border-red-500 text-destructive focus-visible:ring-red-500 placeholder:text-destructive/70 hover:border-red-600 focus:border-red-500',
         success: 'border-green-500 focus-visible:ring-green-500 text-green-700 placeholder:text-green-600/70',
       },
       size: {
