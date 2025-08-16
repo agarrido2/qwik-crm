@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Button } from './button'
 import { Input } from './input'
 import { Badge } from './badge'
-import { Checkbox } from './checkbox'
 
 // Función cn simple sin dependencias externas
 const cn = (...classes: (string | undefined)[]) => {
@@ -126,15 +125,30 @@ export const DataTable = component$<DataTableProps>(({
   })
 
   const handleSelectAll = $(() => {
-    if (state.selectAll) {
-      state.selectedRows.clear()
+    const allCurrentlySelected = paginatedData.every((_, index) => {
+      const globalIndex = startIndex + index
+      return state.selectedRows.has(globalIndex)
+    })
+    
+    if (allCurrentlySelected) {
+      // Deseleccionar todas las filas visibles
+      paginatedData.forEach((_, index) => {
+        const globalIndex = startIndex + index
+        state.selectedRows.delete(globalIndex)
+      })
       state.selectAll = false
     } else {
-      // Seleccionar TODAS las filas de los datos
-      data.forEach((_, index) => {
-        state.selectedRows.add(index)
+      // Seleccionar todas las filas visibles
+      paginatedData.forEach((_, index) => {
+        const globalIndex = startIndex + index
+        state.selectedRows.add(globalIndex)
       })
-      state.selectAll = true
+      // Solo marcar selectAll si TODAS las filas visibles están seleccionadas
+      const nowAllSelected = paginatedData.every((_, index) => {
+        const globalIndex = startIndex + index
+        return state.selectedRows.has(globalIndex)
+      })
+      state.selectAll = nowAllSelected
     }
     
     // Force UI update by triggering reactivity
@@ -156,8 +170,12 @@ export const DataTable = component$<DataTableProps>(({
     // Force UI update by triggering reactivity
     forceUpdate.value++
     
-    // Update selectAll state - debe estar checked solo si TODAS las filas están seleccionadas
-    state.selectAll = data.length > 0 && data.every((_, index) => state.selectedRows.has(index))
+    // Update selectAll state - debe estar checked solo si TODAS las filas visibles están seleccionadas
+    const allVisibleSelected = paginatedData.length > 0 && paginatedData.every((_, index) => {
+      const globalIndex = startIndex + index
+      return state.selectedRows.has(globalIndex)
+    })
+    state.selectAll = allVisibleSelected
     
     if (onSelectionChange$) {
       const selectedData = Array.from(state.selectedRows).map(index => data[index])
@@ -218,10 +236,12 @@ export const DataTable = component$<DataTableProps>(({
             <TableRow>
               {selectable && (
                 <TableHead class="w-[50px]">
-                  <Checkbox
+                  <input
+                    type="checkbox"
                     checked={state.selectAll}
-                    onCheckedChange$={handleSelectAll}
+                    onChange$={handleSelectAll}
                     aria-label="Seleccionar todas las filas"
+                    class="h-4 w-4 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500"
                   />
                 </TableHead>
               )}
@@ -271,10 +291,12 @@ export const DataTable = component$<DataTableProps>(({
                   >
                     {selectable && (
                       <TableCell>
-                        <Checkbox
+                        <input
+                          type="checkbox"
                           checked={state.selectedRows.has(globalIndex) && forceUpdate.value >= 0}
-                          onCheckedChange$={() => handleRowSelect(globalIndex)}
+                          onChange$={() => handleRowSelect(globalIndex)}
                           aria-label={`Seleccionar fila ${index + 1}`}
+                          class="h-4 w-4 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500"
                         />
                       </TableCell>
                     )}

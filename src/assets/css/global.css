@@ -85,8 +85,8 @@
 /* Tailwind CSS layers */
 @theme {
   /* Optimized Font Families - CRM Typography System */
-  --font-family-primary: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-family-secondary: "Lufga", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-primary: "Mulish", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-family-secondary: "Lufga", -apple-system, BlinkMacSystemFont, "Segoe UI", Mulish, "Helvetica Neue", Arial, sans-serif;
   --font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   /* Background Contrast */
@@ -165,6 +165,19 @@
   --min-width-screen-lg: 1024px;
   --container-8xl: 90rem;
   
+  /* Responsive Breakpoints - Tailwind CSS Standard */
+  --breakpoint-sm: 640px;   /* Mobile landscape / Small tablet */
+  --breakpoint-md: 768px;   /* Tablet portrait */
+  --breakpoint-lg: 1024px;  /* Tablet landscape / Small laptop */
+  --breakpoint-xl: 1280px;  /* Desktop */
+  --breakpoint-2xl: 1536px; /* Large desktop */
+  
+  /* Sidebar Responsive Widths */
+  --sidebar-width-mobile: 0px;      /* Hidden on mobile */
+  --sidebar-width-tablet: 280px;    /* Overlay on tablet */
+  --sidebar-width-laptop: 240px;    /* Collapsed on laptop */
+  --sidebar-width-desktop: 320px;   /* Full width on desktop */
+  
   /* Keyframes */
   @keyframes slideFromLeft {
     0% { transform: translateX(-100%); }
@@ -180,7 +193,7 @@
 /* Default Font Configuration */
 @layer base {
   * {
-    font-family: var(--font-family-primary); /* Roboto como fuente por defecto */
+    font-family: var(--font-family-primary); /* Mulish como fuente por defecto */
   }
 }
 

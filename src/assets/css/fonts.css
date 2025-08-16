@@ -4,7 +4,7 @@
  * Using font-display: swap for better performance
  * 
  * FONT STRATEGY (Based on UI/UX Expert Criteria):
- * - Roboto: Application UI (formularios, mensajes, texto general del CRM)
+ * - Mulish: Application UI (formularios, mensajes, texto general del CRM) - REPLACES ROBOTO
  * - Lufga: Landing page (H1, H2, CTAs, branding)
  */
 
@@ -99,6 +99,66 @@
 @font-face {
   font-family: "Lufga";
   src: url("../fonts/Lufga/LufgaBlack.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== MULISH FONT FAMILY - APPLICATION UI (REPLACING ROBOTO) ===== */
+/* Optimized for formularios, mensajes, texto general del CRM */
+/* Modern alternative to Roboto with better readability */
+
+@font-face {
+  font-family: "Mulish";
+  src: url("../fonts/Mulish/Mulish-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mulish";
+  src: url("../fonts/Mulish/Mulish-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mulish";
+  src: url("../fonts/Mulish/Mulish-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mulish";
+  src: url("../fonts/Mulish/Mulish-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mulish";
+  src: url("../fonts/Mulish/Mulish-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mulish";
+  src: url("../fonts/Mulish/Mulish-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mulish";
+  src: url("../fonts/Mulish/Mulish-Black.ttf") format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;

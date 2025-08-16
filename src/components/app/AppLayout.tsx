@@ -1,7 +1,6 @@
-import { component$, Slot } from "@builder.io/qwik"
-import { Header } from "~/components/shared/Header"
-import Sidebar from "~/components/shared/Sidebar"
-import { useAuth } from "~/features/auth"
+import { component$, Slot, useSignal, $ } from '@builder.io/qwik'
+import { SidebarLeft } from '../shared/sidebar-left'
+import { Header } from '../shared/Header'
 
 /**
  * 🏗️ AppLayout Component
@@ -14,23 +13,50 @@ import { useAuth } from "~/features/auth"
  */
 
 export const AppLayout = component$(() => {
-  const auth = useAuth()
+  // Estado para controlar la visibilidad del sidebar en móvil/tablet
+  const isSidebarOpen = useSignal(false)
   
-  // Usar el ID del usuario como clave para forzar re-mount del Header
-  const headerKey = auth.user?.id || 'anonymous'
-  
+  // Toggle del sidebar
+  const toggleSidebar = $(() => {
+    isSidebarOpen.value = !isSidebarOpen.value
+  })
 
   return (
-    <div class="flex h-screen bg-gray-100">
-      {/* Sidebar = Navegación lateral */}
-      <Sidebar />
-      <div class="flex-1 flex flex-col overflow-hidden">
-        {/* Header = Barra superior con info del usuario */}
-        {/* Usar key para forzar re-mount cuando cambia el usuario */}
-        <Header key={headerKey} />
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-          <div class="container mx-auto px-6 py-8">
-            {/* Slot = Contenido específico de cada ruta */}
+    <div class="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <SidebarLeft 
+        isOpen={isSidebarOpen.value}
+        onToggle$={toggleSidebar}
+      />
+      
+      {/* Main content area */}
+      <div class="flex flex-col flex-1 overflow-hidden lg:ml-0">
+        {/* Header */}
+        <Header onToggleSidebar$={toggleSidebar} />
+        
+        {/* Page content */}
+        <main class={[
+          "flex-1 overflow-auto transition-all duration-300",
+          // Mobile: Compact padding
+          "p-4",
+          // Tablet: Standard padding
+          "sm:p-6",
+          // Laptop: Standard padding with collapsed sidebar space
+          "lg:p-8",
+          // Desktop: Generous padding with full sidebar
+          "xl:p-8"
+        ]}>
+          <div class={[
+            "w-full max-w-none transition-all duration-300",
+            // Mobile: Full width
+            "mx-0",
+            // Tablet: Slight margins
+            "sm:mx-2",
+            // Laptop: Standard container
+            "lg:mx-4",
+            // Desktop: Generous container
+            "xl:mx-6"
+          ]}>
             <Slot />
           </div>
         </main>
